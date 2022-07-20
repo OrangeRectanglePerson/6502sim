@@ -2,8 +2,11 @@ package com.example.mcusim;
 
 public abstract class Device {
 
-    public short startAddress;
-    public short endAddress;
+    // TODO: 20/7/2022 Put classes for Devices in its own package
+
+    //default access (subclasses & package)
+    short startAddress;
+    short endAddress;
 
 
     //device puts data onto bus to requested Address (forceful)
@@ -20,6 +23,17 @@ public abstract class Device {
     //device receives data from device on the bus. requestedAdr is Address other device used to request this device (passive)
     public abstract void readFromAddress(short requestedAdr, byte data);
 
-
-
+    //getters and setters
+    public short getStartAddress() {
+        return startAddress;
+    }
+    public void setStartAddress(short startAddress) {
+        this.startAddress = startAddress;
+    }
+    public short getEndAddress() {
+        return endAddress;
+    }
+    public void setEndAddress(short endAddress) {
+        this.endAddress = endAddress;
+    }
 }

@@ -2,11 +2,11 @@ package com.example.mcusim;
 
 public class RAM extends Device{
 
-    public byte[] storage;
+    private byte[] storage;
 
     public RAM(short _startAddress, short _endAddress){
-        this.startAddress = _startAddress;
-        this.endAddress = _endAddress;
+        this.setStartAddress(_startAddress);
+        this.setEndAddress(_endAddress);
         //create storage of bytes ranging from address start to end addresses (size is end - start + 1 bytes)
         storage = new byte[Short.compareUnsigned(_endAddress,_startAddress)+1];
     }
@@ -14,13 +14,13 @@ public class RAM extends Device{
     //writes data into the ram
     @Override
     public void readFromAddress(short receiveAdr, byte data) {
-        storage[Short.compareUnsigned(startAddress,receiveAdr)] = data;
+        storage[Short.compareUnsigned(this.getStartAddress(),receiveAdr)] = data;
     }
 
     //reads data from ram when requested
     @Override
     public byte requestedAddressWrite(short requestedAdr) {
-        return storage[Short.compareUnsigned(startAddress,requestedAdr)];
+        return storage[Short.compareUnsigned(this.getStartAddress(),requestedAdr)];
     }
 
     //ram cannot push data onto bus or forcefully read data from it

@@ -11,8 +11,8 @@ public class CPU extends Device{
     public CPU(){
         //cpu does not require start & end addresses
         //set both to default 0
-        this.startAddress = 0;
-        this.endAddress = 0;
+        this.setStartAddress((short) 0x0000);
+        this.setEndAddress((short) 0x0000);
     }
 
     //cpu takes data fom an address on the bus
