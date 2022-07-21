@@ -2,6 +2,8 @@ package com.example.mcusim;
 
 public class RAM extends Device{
 
+    @SuppressWarnings("FieldMayBeFinal")
+    //idk why this warning suppression is needed because storage can be modified in passivelyRead
     private byte[] storage;
 
     public RAM(short _startAddress, short _endAddress){
@@ -13,13 +15,13 @@ public class RAM extends Device{
 
     //writes data into the ram
     @Override
-    public void readFromAddress(short receiveAdr, byte data) {
+    public void passivelyRead(short receiveAdr, byte data) {
         storage[Short.compareUnsigned(this.getStartAddress(),receiveAdr)] = data;
     }
 
     //reads data from ram when requested
     @Override
-    public byte requestedAddressWrite(short requestedAdr) {
+    public byte readFromAdr(short requestedAdr) {
         return storage[Short.compareUnsigned(this.getStartAddress(),requestedAdr)];
     }
 
@@ -27,11 +29,11 @@ public class RAM extends Device{
     //these methods should NOT be used
     //(trust in the developer)
     @Override
-    public void readAtAddress(short requestAdr, byte data) {
+    public void activelyRead(short requestAdr) {
     }
     @Override
-    public void writeToAddress(short requestAdr, byte data) {
-        super.writeToAddress(requestAdr, data);
+    public void activelyWrite(short requestAdr, byte data) {
+        super.activelyWrite(requestAdr, data);
     }
 
 }

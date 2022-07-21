@@ -9,19 +9,25 @@ public abstract class Device {
     short endAddress;
 
 
-    //device puts data onto bus to requested Address (forceful)
-    public void writeToAddress(short requestAdr, byte data){
+    //use when this device is the "master" pushing data onto the bus
+    public void activelyWrite(short requestAdr, byte data){
         Bus.serveDataToAdr(requestAdr,data);
     }
 
-    //asks device for data located at requested Address (passive)
-    public abstract byte requestedAddressWrite(short requestedAdr);
+    //use when this device is on recipient end of an active write
+    public abstract void passivelyRead(short requestedAdr, byte data);
 
-    //device reads data from device on requested address on the bus (forceful)
-    public abstract void readAtAddress(short requestAdr, byte data);
 
-    //device receives data from device on the bus. requestedAdr is Address other device used to request this device (passive)
-    public abstract void readFromAddress(short requestedAdr, byte data);
+    //this device requests data from a "slave" device through the bus
+    public abstract void activelyRead(short requestAdr);
+
+    //use when this device in on the "giver end" of a requested read
+    //it returns data at the requestedAdr
+    //it will be used later on for debugger/memory map display
+    //by default returns 0 byte
+    public byte readFromAdr(short requestedAdr) { return 0x00; }
+
+
 
     //getters and setters
     public short getStartAddress() {

@@ -13,20 +13,20 @@ public class Bus {
         for(Device d : devices){
             if(Short.compareUnsigned(serveToAdr,d.getStartAddress()) >= 0
                && Short.compareUnsigned(serveToAdr,d.getEndAddress()) <= 0) {
-                d.readFromAddress(serveToAdr,data);
+                d.passivelyRead(serveToAdr,data);
                 return;
             }
         }
     }
 
-    public static byte serveDataFromAdr(short serveFromAdr, byte data){
+    public static byte serveDataFromAdr(short serveFromAdr){
         for(Device d : devices){
             if(Short.compareUnsigned(serveFromAdr,d.getStartAddress()) >= 0
                && Short.compareUnsigned(serveFromAdr,d.getEndAddress()) <= 0){
-                return d.requestedAddressWrite(serveFromAdr);
+                return d.readFromAdr(serveFromAdr);
             }
         }
-        return (short)0x0000;
+        return 0x00;
     }
 
 }
