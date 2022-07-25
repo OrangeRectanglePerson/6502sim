@@ -22,7 +22,7 @@ public class RAM extends Device{
     //reads data from ram when requested
     @Override
     public byte readFromAdr(short requestedAdr) {
-        return storage[Short.compareUnsigned(this.getStartAddress(),requestedAdr)];
+        return storage[Short.compareUnsigned(requestedAdr,this.getStartAddress())];
     }
 
     //ram cannot push data onto bus or forcefully read data from it
