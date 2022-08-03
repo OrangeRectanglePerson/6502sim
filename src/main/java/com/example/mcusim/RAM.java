@@ -29,8 +29,7 @@ public class RAM extends Device{
     //these methods should NOT be used
     //(trust in the developer)
     @Override
-    public void activelyRead(short requestAdr) {
-    }
+    public byte activelyRead(short requestAdr) {return 0;}
     @Override
     public void activelyWrite(short requestAdr, byte data) {
         super.activelyWrite(requestAdr, data);

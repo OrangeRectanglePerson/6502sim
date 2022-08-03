@@ -19,7 +19,8 @@ public abstract class Device {
 
 
     //this device requests data from a "slave" device through the bus
-    public abstract void activelyRead(short requestAdr);
+    //this method returns the value read from that address
+    public abstract byte activelyRead(short requestAdr);
 
     //use when this device in on the "giver end" of a requested read
     //it returns data at the requestedAdr
