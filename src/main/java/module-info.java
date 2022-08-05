@@ -3,6 +3,10 @@ module com.example.mcusim {
     requires javafx.fxml;
 
 
-    opens com.example.mcusim to javafx.fxml;
-    exports com.example.mcusim;
+    opens Extras to javafx.fxml;
+    exports Extras;
+    exports Devices;
+    opens Devices to javafx.fxml;
+    exports MainComComponents;
+    opens MainComComponents to javafx.fxml;
 }

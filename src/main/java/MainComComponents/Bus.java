@@ -1,4 +1,6 @@
-package com.example.mcusim;
+package MainComComponents;
+
+import Devices.Device;
 
 import java.util.ArrayList;
 

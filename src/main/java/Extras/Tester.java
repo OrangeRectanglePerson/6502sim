@@ -1,4 +1,7 @@
-package com.example.mcusim;
+package Extras;
+
+import Devices.RAM;
+import MainComComponents.Bus;
 
 public class Tester {
     public static void main(String[] args) {

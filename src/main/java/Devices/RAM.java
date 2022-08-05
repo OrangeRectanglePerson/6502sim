@@ -1,4 +1,4 @@
-package com.example.mcusim;
+package Devices;
 
 public class RAM extends Device{
 

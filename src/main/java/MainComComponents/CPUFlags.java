@@ -1,4 +1,4 @@
-package com.example.mcusim;
+package MainComComponents;
 
 public enum CPUFlags {
     CARRY((byte)(1 << 0)),

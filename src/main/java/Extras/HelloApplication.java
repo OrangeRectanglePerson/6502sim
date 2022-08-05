@@ -1,4 +1,4 @@
-package com.example.mcusim;
+package Extras;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

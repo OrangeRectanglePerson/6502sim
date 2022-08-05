@@ -1,4 +1,6 @@
-package com.example.mcusim;
+package Devices;
+
+import MainComComponents.Bus;
 
 public abstract class Device {
 

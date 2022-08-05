@@ -1,4 +1,4 @@
-package com.example.mcusim;
+package Extras;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
