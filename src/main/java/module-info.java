@@ -9,4 +9,6 @@ module com.example.mcusim {
     opens Devices to javafx.fxml;
     exports MainComComponents;
     opens MainComComponents to javafx.fxml;
+    exports FrontEnd;
+    opens FrontEnd to javafx.fxml;
 }
