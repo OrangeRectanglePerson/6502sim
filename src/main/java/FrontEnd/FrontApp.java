@@ -12,6 +12,7 @@ public class FrontApp extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        stage.setResizable(true);
         stage.setTitle("Minions 2 The Rise Of Gru!");
         stage.setScene(scene);
         stage.show();

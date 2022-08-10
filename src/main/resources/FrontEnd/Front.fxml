@@ -12,11 +12,11 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FrontEnd.FrontControl">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FrontEnd.FrontControl">
    <children>
       <AnchorPane layoutX="71.0" layoutY="9.0" prefHeight="600.0" prefWidth="440.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="360.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ToolBar prefHeight="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ToolBar prefHeight="45.0" prefWidth="440.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
                 <Button alignment="CENTER" mnemonicParsing="false" style="-fx-background-color: #ea7500; -fx-border-color: #ff860d; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="ROM" textAlignment="CENTER">
                      <font>
@@ -53,164 +53,164 @@
                   <Insets />
                </opaqueInsets>
             </ToolBar>
-            <Pane layoutX="1.0" layoutY="39.0" prefHeight="240.0" prefWidth="255.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
+            <Pane layoutX="1.0" layoutY="39.0" prefHeight="555.0" prefWidth="440.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="45.0" />
          </children></AnchorPane>
       <AnchorPane layoutX="586.0" layoutY="389.0" prefHeight="600.0" prefWidth="360.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="440.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label alignment="CENTER" layoutX="166.0" layoutY="6.0" prefHeight="25.0" prefWidth="360.0" style="-fx-background-color: #333333;" text="CPU" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Label alignment="CENTER" layoutX="166.0" layoutY="6.0" prefHeight="25.0" prefWidth="360.0" style="-fx-background-color: #333333;" text="CPU" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
                   <Font name="Consolas" size="20.0" />
                </font>
             </Label>
-            <AnchorPane layoutY="31.0" style="-fx-background-color: #334004;" AnchorPane.bottomAnchor="220.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="25.0">
+            <AnchorPane layoutY="31.0" prefHeight="355.0" prefWidth="220.0" style="-fx-background-color: #334004;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="25.0">
                <children>
-                  <ComboBox layoutX="30.0" layoutY="10.0" prefHeight="42.0" prefWidth="170.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
-                  <TextArea layoutX="6.0" layoutY="71.0" prefHeight="275.0" prefWidth="200.0" style="-fx-control-inner-background: #000000;" text="0x0000: 0x69 0b01101001&#10;1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8&#10;9&#10;a&#10;b&#10;c&#10;d&#10;e&#10;f&#10;10" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="60.0">
+                  <ComboBox layoutX="30.0" layoutY="10.0" prefHeight="50.0" prefWidth="180.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="5.0" />
+                  <TextArea layoutX="6.0" layoutY="71.0" prefHeight="290.0" prefWidth="210.0" style="-fx-control-inner-background: #000000;" text="0x0000: 0x69 0b01101001&#10;1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8&#10;9&#10;a&#10;b&#10;c&#10;d&#10;e&#10;f&#10;10" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="60.0">
                      <font>
                         <Font name="Consolas" size="13.5" />
                      </font>
                   </TextArea>
                </children>
             </AnchorPane>
-            <AnchorPane layoutX="220.0" layoutY="30.0" style="-fx-background-color: #000080;" AnchorPane.bottomAnchor="290.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+            <AnchorPane layoutX="220.0" layoutY="30.0" prefHeight="285.0" prefWidth="140.0" style="-fx-background-color: #000080;" AnchorPane.leftAnchor="220.0" AnchorPane.topAnchor="25.0">
                <children>
-                  <Separator layoutY="131.0" prefHeight="47.0" prefWidth="140.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                  <Label alignment="CENTER" layoutX="42.0" layoutY="36.0" text="Clock Cycle Number:" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.bottomAnchor="230.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0">
+                  <Separator layoutY="126.0" prefHeight="45.0" prefWidth="140.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="130.0" />
+                  <Label alignment="CENTER" layoutX="42.0" layoutY="36.0" prefHeight="45.0" prefWidth="130.0" text="Clock Cycle Number:" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="10.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" layoutX="11.0" layoutY="42.0" prefHeight="17.0" prefWidth="73.0" text="0" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="55.0">
+                  <Label alignment="CENTER" layoutX="11.0" layoutY="42.0" prefHeight="18.0" prefWidth="130.0" text="0" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="55.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Label>
-                  <Button alignment="CENTER" layoutX="44.0" layoutY="70.0" mnemonicParsing="false" style="-fx-background-color: #4700b8; -fx-border-color: #b3b3b3; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="Step Instruction" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+                  <Button alignment="CENTER" layoutX="44.0" layoutY="70.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="120.0" style="-fx-background-color: #4700b8; -fx-border-color: #b3b3b3; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="Step Instruction" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="80.0">
                      <font>
                         <Font name="Consolas" size="15.0" />
                      </font>
                   </Button>
-                  <TextField layoutX="10.0" layoutY="165.0" promptText="CPU Hz" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="165.0">
+                  <TextField layoutX="10.0" layoutY="165.0" prefHeight="30.0" prefWidth="90.0" promptText="CPU Hz" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="165.0">
                      <font>
                         <Font name="Consolas" size="15.0" />
                      </font>
                   </TextField>
-                  <Label alignment="CENTER" layoutX="95.0" layoutY="165.0" text="Hz" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="165.0">
+                  <Label alignment="CENTER" layoutX="95.0" layoutY="165.0" prefHeight="30.0" prefWidth="18.0" text="Hz" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="165.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Label>
-                  <Button alignment="CENTER" layoutX="10.0" layoutY="209.0" mnemonicParsing="false" style="-fx-background-color: #00ae00; -fx-border-color: #3465a4; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="Start/&#10;Pause" textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="210.0">
+                  <Button alignment="CENTER" layoutX="10.0" layoutY="209.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="120.0" style="-fx-background-color: #00ae00; -fx-border-color: #3465a4; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="Start/&#10;Pause" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="210.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Button>
                </children>
             </AnchorPane>
-            <AnchorPane layoutX="220.0" layoutY="317.0" style="-fx-background-color: #7e0021;" AnchorPane.bottomAnchor="220.0" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="310.0">
+            <AnchorPane layoutX="220.0" layoutY="317.0" prefHeight="70.0" prefWidth="140.0" style="-fx-background-color: #7e0021;" AnchorPane.leftAnchor="220.0" AnchorPane.topAnchor="310.0">
                <children>
-                  <Button alignment="CENTER" layoutX="13.0" layoutY="8.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="120.0" style="-fx-background-color: #ffff00; -fx-border-color: BLACK; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="RESET" textAlignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                  <Button alignment="CENTER" layoutX="13.0" layoutY="8.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="120.0" style="-fx-background-color: #ffff00; -fx-border-color: BLACK; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="RESET" textAlignment="CENTER" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Button>
                </children>
             </AnchorPane>
-            <AnchorPane layoutY="380.0" prefHeight="120.0" prefWidth="360.0" style="-fx-background-color: #4b1f6f;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="380.0">
+            <AnchorPane layoutY="380.0" prefHeight="120.0" prefWidth="360.0" style="-fx-background-color: #4b1f6f;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="380.0">
                <children>
-                  <Label alignment="CENTER" layoutX="166.0" layoutY="14.0" text="Registers:" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="5.0">
+                  <Label alignment="CENTER" layoutX="166.0" layoutY="14.0" prefHeight="18.0" prefWidth="120.0" text="Registers:" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="5.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="14.0" layoutY="23.0" text="A:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="25.0">
+                  <Label layoutX="14.0" layoutY="23.0" prefHeight="17.0" prefWidth="16.0" text="A:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="25.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="14.0" layoutY="40.0" text="X:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="45.0">
+                  <Label layoutX="14.0" layoutY="40.0" prefHeight="17.0" prefWidth="16.0" text="X:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="45.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="14.0" layoutY="60.0" text="Y:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="65.0">
+                  <Label layoutX="14.0" layoutY="60.0" prefHeight="17.0" prefWidth="16.0" text="Y:" textFill="WHITE" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="65.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="27.0" layoutY="32.0" prefWidth="130.0" text="0x00 0b00000000&#9;&#10;0x00 0b00000000&#10;0x00 0b00000000" textFill="WHITE" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="25.0">
+                  <Label layoutX="27.0" layoutY="32.0" prefHeight="57.0" prefWidth="130.0" text="0x00 0b00000000&#9;&#10;0x00 0b00000000&#10;0x00 0b00000000" textFill="WHITE" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="25.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="200.0" layoutY="25.0" text="PC:" textFill="WHITE" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="25.0">
+                  <Label layoutX="200.0" layoutY="25.0" prefHeight="17.0" prefWidth="30.0" text="PC:" textFill="WHITE" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="25.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="210.0" layoutY="35.0" text="0x0000" textFill="WHITE" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="40.0">
+                  <Label layoutX="210.0" layoutY="35.0" prefHeight="17.0" prefWidth="50.0" text="0x0000" textFill="WHITE" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="40.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="210.0" layoutY="35.0" text="SP:" textFill="WHITE" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="25.0">
+                  <Label layoutX="210.0" layoutY="35.0" prefHeight="17.0" prefWidth="30.0" text="SP:" textFill="WHITE" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="25.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="210.0" layoutY="50.0" text="0x0100" textFill="WHITE" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="40.0">
+                  <Label layoutX="210.0" layoutY="50.0" prefHeight="17.0" prefWidth="50.0" text="0x0100" textFill="WHITE" AnchorPane.leftAnchor="280.0" AnchorPane.topAnchor="40.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="21.0" layoutY="94.0" text="Status Regisers:" textFill="WHITE" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="21.0" layoutY="94.0" prefHeight="17.0" prefWidth="130.0" text="Status Regisers:" textFill="WHITE" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="161.0" layoutY="89.0" text="C" textFill="RED" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="161.0" layoutY="89.0" prefHeight="17.0" prefWidth="10.0" text="C" textFill="RED" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="170.0" layoutY="100.0" text="Z" textFill="RED" AnchorPane.leftAnchor="190.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="170.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="Z" textFill="RED" AnchorPane.leftAnchor="190.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="190.0" layoutY="100.0" text="I" textFill="RED" AnchorPane.leftAnchor="210.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="190.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="I" textFill="RED" AnchorPane.leftAnchor="210.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="210.0" layoutY="100.0" text="D" textFill="RED" AnchorPane.leftAnchor="230.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="210.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="D" textFill="RED" AnchorPane.leftAnchor="230.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="230.0" layoutY="100.0" text="B" textFill="RED" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="230.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="B" textFill="RED" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="250.0" layoutY="100.0" text="U" textFill="LIME" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="250.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="U" textFill="LIME" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="270.0" layoutY="100.0" text="V" textFill="RED" AnchorPane.leftAnchor="290.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="270.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="V" textFill="RED" AnchorPane.leftAnchor="290.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="290.0" layoutY="100.0" text="N" textFill="RED" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="90.0">
+                  <Label layoutX="290.0" layoutY="100.0" prefHeight="17.0" prefWidth="10.0" text="N" textFill="RED" AnchorPane.leftAnchor="310.0" AnchorPane.topAnchor="90.0">
                      <font>
                         <Font name="Consolas Bold" size="14.0" />
                      </font>
                   </Label>
                </children>
             </AnchorPane>
-            <Label alignment="CENTER" layoutX="180.0" layoutY="550.0" prefHeight="100.0" prefWidth="360.0" style="-fx-background-color: #00a8a9;" text="6502 Microcomputer Emulator&#10;[About Me Goes Here]" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <Label alignment="CENTER" layoutX="180.0" layoutY="550.0" prefHeight="100.0" prefWidth="360.0" style="-fx-background-color: #00a8a9;" text="6502 Microcomputer Emulator&#10;[About Me Goes Here]" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="500.0">
                <font>
                   <Font name="Consolas" size="18.0" />
                </font>

@@ -226,6 +226,93 @@ public class CPU{
         else return 0;
     }
 
+    //fetch the data from the address into fetched
+    private void fetch(){
+        fetched = Bus.serveDataFromAdr(addr_abs);
+    }
+
     //OPCODES
+
+    // Addition w/ carry in
+    // Function:    A = A + M + C
+    // Flags Out:   C, V, N, Z
+    // This function is to add a value to the accumulator and a carry bit.
+    // If the result is > 255 there is an overflow setting the carry bit.
+    //
+    // In principle under the -128 to 127 range:
+    // 10000000 = -128, 11111111 = -1, 00000000 = 0, 00000001 = +1, 01111111 = +127
+    //
+    // Overflow possibilities hypothesis
+    // Positive Number + Positive Number = Negative Result -> Overflow
+    // Negative Number + Negative Number = Positive Result -> Overflow
+    // Positive Number + Negative Number = Either Result -> Cannot Overflow
+    // Positive Number + Positive Number = Positive Result -> OK! No Overflow
+    // Negative Number + Negative Number = Negative Result -> OK! NO Overflow
+    // NOTE!
+    // THE OVERFLOW FLAG IS FOR OVERFLOW IF TEH ADDITION WAS SIGNED
+    private byte ADC(){
+        //fetch data
+        fetch();
+
+        //add bytes from accumulator, fetched and carry flag
+        temp = (short) (Byte.toUnsignedInt(a) + Byte.toUnsignedInt(fetched) + Byte.toUnsignedInt(getFlag(CPUFlags.CARRY)));
+
+        //set carry flag if bit 9 is 1
+        setFlag(CPUFlags.CARRY, temp > 255);
+
+        //set zero flag if low byte of temp is 0
+        setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0);
+
+        //set signed overflow flag based on logic above
+        //num is negative is Byte toUnsignedInt > 127
+        //if pos + neg
+        setFlag(CPUFlags.OVERFLOW, false);
+        if(a > 0 && fetched > 0){
+            if (fetched > (Byte.MAX_VALUE - a - getFlag(CPUFlags.CARRY))) setFlag(CPUFlags.OVERFLOW, true);
+        }
+        if(a < 0 && fetched < 0){
+            if (fetched < (Byte.MIN_VALUE - a - getFlag(CPUFlags.CARRY))) setFlag(CPUFlags.OVERFLOW, true);
+        }
+
+        // The negative flag is set to the most significant bit of the resultant byte
+        setFlag(CPUFlags.NEGATIVE, (temp & 0x0080) == 0x0080);
+
+        // Load the result(temp) into the accumulator
+        a = (byte) temp;
+
+        // This instruction has the potential to require an additional clock cycle
+        return 1;
+    }
+
+    // Instruction: Subtraction with Borrow In
+    // Function: A = A - M - (1 - C)
+    // Flags Out: C, V, N, Z
+    private byte SBC(){
+        //fetch the data
+        fetch();
+
+        //math (should not go into int range, right??????)
+        temp = (short)(Byte.toUnsignedInt(a) - Byte.toUnsignedInt(fetched) - (1-Byte.toUnsignedInt(getFlag(CPUFlags.CARRY))));
+
+        //set carry flag if there needed to be a carry in order to do the operation
+        // (the high byte of the short will be all ones)
+        //e.g. 100-(-100) = 0b0110_0100 - 0b1001_1100
+        //or 10 - 100 = 0b0000_1111 - 0b0110_0100
+        setFlag(CPUFlags.CARRY, (temp & 0xff00) == 0xff00);
+
+        //set the zero flag
+        setFlag(CPUFlags.CARRY, (temp & 0x00ff) == 0);
+
+        //set the overflow flag
+        setFlag(CPUFlags.OVERFLOW, temp != a - fetched - (1 - getFlag(CPUFlags.CARRY)));
+
+        // The negative flag is set to the most significant bit of the resultant byte
+        setFlag(CPUFlags.NEGATIVE, (temp & 0x0080) == 0x0080);
+
+        // This instruction has the potential to require an additional clock cycle
+        return 1;
+    }
+
+
 
 }
