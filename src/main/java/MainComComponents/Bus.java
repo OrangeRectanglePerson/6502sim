@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public class Bus {
 
-    // TODO: 20/7/2022 Put Bus in a separate Package from the Devices
-
     public static ArrayList<Device> devices = new ArrayList<>();
 
     public static CPU processor;

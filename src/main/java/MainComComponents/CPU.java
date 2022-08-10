@@ -309,6 +309,9 @@ public class CPU{
         // The negative flag is set to the most significant bit of the resultant byte
         setFlag(CPUFlags.NEGATIVE, (temp & 0x0080) == 0x0080);
 
+        // load the result(low bytes of temp) into accumulator
+        a = (byte) temp;
+
         // This instruction has the potential to require an additional clock cycle
         return 1;
     }

@@ -4,8 +4,6 @@ import MainComComponents.Bus;
 
 public abstract class Device {
 
-    // TODO: 20/7/2022 Put classes for Devices in its own package
-
     //default access (subclasses & package)
     short startAddress;
     short endAddress;
