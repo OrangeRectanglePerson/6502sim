@@ -615,13 +615,53 @@ public class CPU{
                 cycles = 2;
             }
             //91 sta izy 6
+            else if ((opcode & 0xff) == 0x91) {
+                extraCycleA = IZY();
+                extraCycleB = STA();
+                cycles = 6;
+            }
             //94 sty zpx 4
+            else if ((opcode & 0xff) == 0x94) {
+                extraCycleA = ZPX();
+                extraCycleB = STY();
+                cycles = 4;
+            }
             //95 sta zpx 4
+            else if ((opcode & 0xff) == 0x95) {
+                extraCycleA = ZPX();
+                extraCycleB = STA();
+                cycles = 4;
+            }
             //96 stx zpy 4
+            else if ((opcode & 0xff) == 0x96) {
+                extraCycleA = ZPY();
+                extraCycleB = STX();
+                cycles = 4;
+            }
             //98 tya imp 2
+            else if ((opcode & 0xff) == 0x98) {
+                extraCycleA = IMP();
+                extraCycleB = TYA();
+                cycles = 2;
+            }
             //99 sta aby 5
+            else if ((opcode & 0xff) == 0x99) {
+                extraCycleA = ABY();
+                extraCycleB = STA();
+                cycles = 5;
+            }
             //9a txs imp 2
+            else if ((opcode & 0xff) == 0x9A) {
+                extraCycleA = IMP();
+                extraCycleB = TXS();
+                cycles = 2;
+            }
             //9d sta abx 5
+            else if ((opcode & 0xff) == 0x9D) {
+                extraCycleA = ABX();
+                extraCycleB = STA();
+                cycles = 5;
+            }
 
             //high nibble 0xa
             //a0 ldy imm 2
