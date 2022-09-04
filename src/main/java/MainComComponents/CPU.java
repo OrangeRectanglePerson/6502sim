@@ -9,9 +9,9 @@ public class CPU{
 
     //internal registers
     private short programCounter = 0x0000;
-    private byte a = 0x00;
-    private byte x = 0x00;
-    private byte y = 0x00;
+    private byte a = 0x00; //accumulator
+    private byte x = 0x00; //x register
+    private byte y = 0x00; //y register
     private byte stackPointer = 0x00;
     private byte stat_regs = 0x00;
 
@@ -69,6 +69,635 @@ public class CPU{
     //CLOCK, INTERRUPT & RESET
 
     public void clock() {
+        //here we define what happens in 1 clock cycle
+
+        /* we will use the cycles variable here
+         * the cycles variable keeps track of how many cycles the current instruction needs left
+         * when the cycles > 0, this means in real life, the processor is still processing the instruction on this tick
+         * in the emulator, we will emulate this by doing nothing but decrementing the clock variable when clock > 0
+         * else, lets do the monstrosity that is the 150+ rung ifelse ladder
+         *
+         * the anatomy of an instruction-executing clock cycle:
+         * 1) read in an instruction @ current program counter
+         * 2) increment program counter (move to next addr)
+         * 3) set number of cycles needed
+         * 4) set/execute/choose addressing mode (store returned byte in variable "extraCycleA")
+         * 5) perform operation (store returned byte in variable "extraCycleB")
+         * 6) if both extraCycleA & B are 1 then add additional cycle to cycle count
+         *
+         * [3, 4 & 5 will be painful because there are 150+ possible combinations and i don't think arrays of
+         * method references exist in java]
+         *
+         * 2 things always to do when running a clock cycle (at the end):
+         * 1) decrease number of clock cycles left for current instruction
+         * 2) increase clock count variable (it stores total num of clocks the cpu has run)
+         */
+
+        byte extraCycleA, extraCycleB;
+        if(cycles <= 0){
+            //1
+            opcode = activelyRead(programCounter);
+
+            //2
+            programCounter++;
+
+            //3, 4 & 5
+
+            //high nibble is 0x0
+            //00 brk imm 7
+            if ((opcode & 0xff) == 0x00){
+                extraCycleA = IMP();
+                extraCycleB = BRK();
+                cycles = 7;
+            }
+            //01 ora izx 6
+            else if ((opcode & 0xff) == 0x01) {
+                extraCycleA = IZX();
+                extraCycleB = ORA();
+                cycles = 6;
+            }
+            //05 ora zp0 3
+            else if ((opcode & 0xff) == 0x05) {
+                extraCycleA = ZP0();
+                extraCycleB = ORA();
+                cycles = 3;
+            }
+            //06 asl zp0 5
+            else if ((opcode & 0xff) == 0x06) {
+                extraCycleA = ZP0();
+                extraCycleB = ASL();
+                cycles = 5;
+            }
+            //08 php imp 3
+            else if ((opcode & 0xff) == 0x08) {
+                extraCycleA = IMP();
+                extraCycleB = PHP();
+                cycles = 3;
+            }
+            //09 ora imm 2
+            else if ((opcode & 0xff) == 0x09) {
+                extraCycleA = IMM();
+                extraCycleB = ORA();
+                cycles = 2;
+            }
+            //0a asl imp 2
+            else if ((opcode & 0xff) == 0x0A) {
+                extraCycleA = IMP();
+                extraCycleB = ASL();
+                cycles = 2;
+            }
+            //0d ora abs 4
+            else if ((opcode & 0xff) == 0x0D) {
+                extraCycleA = ABS();
+                extraCycleB = ORA();
+                cycles = 4;
+            }
+            //0e asl abs 6
+            else if ((opcode & 0xff) == 0x0E) {
+                extraCycleA = ABS();
+                extraCycleB = ASL();
+                cycles = 6;
+            }
+
+            //high nibble is 0x1
+            //10 bpl rel 2
+            else if ((opcode & 0xff) == 0x10) {
+                extraCycleA = REL();
+                extraCycleB = BPL();
+                cycles = 2;
+            }
+            //11 ora izy 5
+            else if ((opcode & 0xff) == 0x11) {
+                extraCycleA = IZY();
+                extraCycleB = ORA();
+                cycles = 5;
+            }
+            //15 ora zpx 4
+            else if ((opcode & 0xff) == 0x15) {
+                extraCycleA = ZPX();
+                extraCycleB = ORA();
+                cycles = 4;
+            }
+            //16 asl zpx 6
+            else if ((opcode & 0xff) == 0x16) {
+                extraCycleA = ZPX();
+                extraCycleB = ASL();
+                cycles = 6;
+            }
+            //18 clc imp 2
+            else if ((opcode & 0xff) == 0x18) {
+                extraCycleA = IMP();
+                extraCycleB = CLC();
+                cycles = 2;
+            }
+            //19 ora aby 4
+            else if ((opcode & 0xff) == 0x19) {
+                extraCycleA = ABY();
+                extraCycleB = ORA();
+                cycles = 4;
+            }
+            //1d ora abx 4
+            else if ((opcode & 0xff) == 0x1D) {
+                extraCycleA = ABX();
+                extraCycleB = ORA();
+                cycles = 4;
+            }
+            //1e asl abx 7
+            else if ((opcode & 0xff) == 0x1E) {
+                extraCycleA = ABX();
+                extraCycleB = ASL();
+                cycles = 7;
+            }
+
+            //high nibble 0x2
+            //20 jsr abs 6
+            else if ((opcode & 0xff) == 0x20) {
+                extraCycleA = ABS();
+                extraCycleB = JSR();
+                cycles = 6;
+            }
+            //21 and izx 6
+            else if ((opcode & 0xff) == 0x21) {
+                extraCycleA = IZX();
+                extraCycleB = AND();
+                cycles = 6;
+            }
+            //24 bit zp0 3
+            else if ((opcode & 0xff) == 0x24) {
+                extraCycleA = ZP0();
+                extraCycleB = BIT();
+                cycles = 3;
+            }
+            //25 and zpo 3
+            else if ((opcode & 0xff) == 0x25) {
+                extraCycleA = ZP0();
+                extraCycleB = AND();
+                cycles = 3;
+            }
+            //26 rol zp0 5
+            else if ((opcode & 0xff) == 0x26) {
+                extraCycleA = ZP0();
+                extraCycleB = ROL();
+                cycles = 5;
+            }
+            //28 plp imp 4
+            else if ((opcode & 0xff) == 0x28) {
+                extraCycleA = IMP();
+                extraCycleB = PLP();
+                cycles = 4;
+            }
+            //29 and imm 2
+            else if ((opcode & 0xff) == 0x29) {
+                extraCycleA = IMM();
+                extraCycleB = AND();
+                cycles = 2;
+            }
+            //2a rol imp 2
+            else if ((opcode & 0xff) == 0x2A) {
+                extraCycleA = IMP();
+                extraCycleB = ROL();
+                cycles = 2;
+            }
+            //2c bit abs 4
+            else if ((opcode & 0xff) == 0x2C) {
+                extraCycleA = ABS();
+                extraCycleB = BIT();
+                cycles = 4;
+            }
+            //2d and abs 4
+            else if ((opcode & 0xff) == 0x2D) {
+                extraCycleA = ABS();
+                extraCycleB = AND();
+                cycles = 4;
+            }
+            //2e rol abs 6
+            else if ((opcode & 0xff) == 0x2E) {
+                extraCycleA = ABS();
+                extraCycleB = ROL();
+                cycles = 6;
+            }
+
+            //high nibble 0x3
+            //30 bmi rel 2
+            else if ((opcode & 0xff) == 0x30) {
+                extraCycleA = REL();
+                extraCycleB = BMI();
+                cycles = 2;
+            }
+            //31 and izy 5
+            else if ((opcode & 0xff) == 0x31) {
+                extraCycleA = IZY();
+                extraCycleB = AND();
+                cycles = 5;
+            }
+            //35 and zpx 4
+            else if ((opcode & 0xff) == 0x35) {
+                extraCycleA = ZPX();
+                extraCycleB = AND();
+                cycles = 4;
+            }
+            //36 rol zpx 6
+            else if ((opcode & 0xff) == 0x36) {
+                extraCycleA = ZPX();
+                extraCycleB = ROL();
+                cycles = 6;
+            }
+            //38 sec imp 2
+            else if ((opcode & 0xff) == 0x38) {
+                extraCycleA = IMP();
+                extraCycleB = SEC();
+                cycles = 2;
+            }
+            //39 and abx 4
+            else if ((opcode & 0xff) == 0x39) {
+                extraCycleA = ABX();
+                extraCycleB = AND();
+                cycles = 4;
+            }
+            //3d and abx 4
+            else if ((opcode & 0xff) == 0x3D) {
+                extraCycleA = ABX();
+                extraCycleB = AND();
+                cycles = 4;
+            }
+            //3e rol abx 7
+            else if ((opcode & 0xff) == 0x3E) {
+                extraCycleA = ABX();
+                extraCycleB = ROL();
+                cycles = 7;
+            }
+
+            //high nibble 0x4
+            //40 rti imp 6
+            else if ((opcode & 0xff) == 0x40) {
+                extraCycleA = IMP();
+                extraCycleB = RTI();
+                cycles = 6;
+            }
+            //41 eor izx 6
+            else if ((opcode & 0xff) == 0x41) {
+                extraCycleA = IZX();
+                extraCycleB = EOR();
+                cycles = 6;
+            }
+            //45 eor zp0 3
+            else if ((opcode & 0xff) == 0x45) {
+                extraCycleA = ZP0();
+                extraCycleB = EOR();
+                cycles = 3;
+            }
+            //46 lsr zp0 5
+            else if ((opcode & 0xff) == 0x46) {
+                extraCycleA = ZP0();
+                extraCycleB = LSR();
+                cycles = 5;
+            }
+            //48 pha imp 3
+            else if ((opcode & 0xff) == 0x48) {
+                extraCycleA = IMP();
+                extraCycleB = PHA();
+                cycles = 3;
+            }
+            //49 eor imm 2
+            else if ((opcode & 0xff) == 0x49) {
+                extraCycleA = IMM();
+                extraCycleB = EOR();
+                cycles = 2;
+            }
+            //4a lsr imp 2
+            else if ((opcode & 0xff) == 0x4A) {
+                extraCycleA = IMP();
+                extraCycleB = LSR();
+                cycles = 2;
+            }
+            //4c jmp abs 3
+            else if ((opcode & 0xff) == 0x4C) {
+                extraCycleA = ABS();
+                extraCycleB = JMP();
+                cycles = 3;
+            }
+            //4d eor abs 4
+            else if ((opcode & 0xff) == 0x4D) {
+                extraCycleA = ABS();
+                extraCycleB = EOR();
+                cycles = 4;
+            }
+            //4e lsr abs 6
+            else if ((opcode & 0xff) == 0x4E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+
+            //high nibble 0x5
+            //50 bvc rel 2
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //51 eor izy 5
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //55 eor zpx 4
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //56 lsr zpx 6
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //58 cli imp 2
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //59 eor aby 4
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //5d eor abx 4
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+            //5e lsr abx 7
+            else if ((opcode & 0xff) == 0x5E) {
+                extraCycleA = ABS();
+                extraCycleB = LSR();
+                cycles = 6;
+            }
+
+            //high nibble 0x6
+            //60 rts imp 6
+            else if ((opcode & 0xff) == 0x60) {
+                extraCycleA = IMP();
+                extraCycleB = RTS();
+                cycles = 6;
+            }
+            //61 adc izx 6
+            else if ((opcode & 0xff) == 0x61) {
+                extraCycleA = IZX();
+                extraCycleB = ADC();
+                cycles = 6;
+            }
+            //65 adc zp0 3
+            else if ((opcode & 0xff) == 0x65) {
+                extraCycleA = ZP0();
+                extraCycleB = ADC();
+                cycles = 3;
+            }
+            //66 ror zp0 5
+            else if ((opcode & 0xff) == 0x66) {
+                extraCycleA = ZP0();
+                extraCycleB = ROR();
+                cycles = 5;
+            }
+            //68 pla imp 4
+            else if ((opcode & 0xff) == 0x68) {
+                extraCycleA = IMP();
+                extraCycleB = PLA();
+                cycles = 4;
+            }
+            //69 adc imm 2
+            else if ((opcode & 0xff) == 0x69) {
+                extraCycleA = IMM();
+                extraCycleB = ADC();
+                cycles = 2;
+            }
+            //6a ror imp 2
+            else if ((opcode & 0xff) == 0x6A) {
+                extraCycleA = IMP();
+                extraCycleB = ROR();
+                cycles = 2;
+            }
+            //6c jmp ind 5
+            else if ((opcode & 0xff) == 0x6C) {
+                extraCycleA = IND();
+                extraCycleB = JMP();
+                cycles = 5;
+            }
+            //6d adc abs 4
+            else if ((opcode & 0xff) == 0x6D) {
+                extraCycleA = ABS();
+                extraCycleB = ADC();
+                cycles = 4;
+            }
+            //6e ror abs 6
+            else if ((opcode & 0xff) == 0x6E) {
+                extraCycleA = ABS();
+                extraCycleB = ROR();
+                cycles = 6;
+            }
+
+            //high nibble 0x7
+            //70 bvs rel 2
+            else if ((opcode & 0xff) == 0x70) {
+                extraCycleA = REL();
+                extraCycleB = BVS();
+                cycles = 2;
+            }
+            //71 adc izy 5
+            else if ((opcode & 0xff) == 0x71) {
+                extraCycleA = IZY();
+                extraCycleB = ADC();
+                cycles = 5;
+            }
+            //75 adc zpx 4
+            else if ((opcode & 0xff) == 0x75) {
+                extraCycleA = ZPX();
+                extraCycleB = ADC();
+                cycles = 4;
+            }
+            //76 ror zpx 6
+            else if ((opcode & 0xff) == 0x76) {
+                extraCycleA = ZPX();
+                extraCycleB = ROR();
+                cycles = 6;
+            }
+            //78 sei imp 2
+            else if ((opcode & 0xff) == 0x78) {
+                extraCycleA = IMP();
+                extraCycleB = SEI();
+                cycles = 2;
+            }
+            //79 adc aby 4
+            else if ((opcode & 0xff) == 0x79) {
+                extraCycleA = ABY();
+                extraCycleB = ADC();
+                cycles = 4;
+            }
+            //7d adc abx 4
+            else if ((opcode & 0xff) == 0x7D) {
+                extraCycleA = ABX();
+                extraCycleB = ADC();
+                cycles = 4;
+            }
+            //7e ror abx 7
+            else if ((opcode & 0xff) == 0x7E) {
+                extraCycleA = ABX();
+                extraCycleB = ROR();
+                cycles = 7;
+            }
+
+            //high nibble 0x8
+            //81 sta izx 6
+            else if ((opcode & 0xff) == 0x81) {
+                extraCycleA = IZX();
+                extraCycleB = STA();
+                cycles = 6;
+            }
+            //84 sty zp0 3
+            else if ((opcode & 0xff) == 0x84) {
+                extraCycleA = ZP0();
+                extraCycleB = STY();
+                cycles = 3;
+            }
+            //85 sta zp0 3
+            else if ((opcode & 0xff) == 0x85) {
+                extraCycleA = ZP0();
+                extraCycleB = STA();
+                cycles = 3;
+            }
+            //86 stx zp0 3
+            else if ((opcode & 0xff) == 0x86) {
+                extraCycleA = ZP0();
+                extraCycleB = STX();
+                cycles = 3;
+            }
+            //88 dey imp 2
+            else if ((opcode & 0xff) == 0x88) {
+                extraCycleA = IMP();
+                extraCycleB = DEY();
+                cycles = 2;
+            }
+            //8a txa imp 2
+            else if ((opcode & 0xff) == 0x8A) {
+                extraCycleA = IMP();
+                extraCycleB = TXA();
+                cycles = 2;
+            }
+            //8c sty abs 4
+            else if ((opcode & 0xff) == 0x8C) {
+                extraCycleA = ABS();
+                extraCycleB = STY();
+                cycles = 4;
+            }
+            //8d sta abs 4
+            else if ((opcode & 0xff) == 0x8D) {
+                extraCycleA = ABS();
+                extraCycleB = STA();
+                cycles = 4;
+            }
+            //8e stx abs 4
+            else if ((opcode & 0xff) == 0x8E) {
+                extraCycleA = ABS();
+                extraCycleB = STX();
+                cycles = 4;
+            }
+
+            //high nibble 0x9
+            //90 bcc rel 2
+            else if ((opcode & 0xff) == 0x90) {
+                extraCycleA = REL();
+                extraCycleB = BCC();
+                cycles = 2;
+            }
+            //91 sta izy 6
+            //94 sty zpx 4
+            //95 sta zpx 4
+            //96 stx zpy 4
+            //98 tya imp 2
+            //99 sta aby 5
+            //9a txs imp 2
+            //9d sta abx 5
+
+            //high nibble 0xa
+            //a0 ldy imm 2
+            //a1 lda izx 6
+            //a2 ldx imm 2
+            //a4 ldy zp0 3
+            //a5 lda zp0 3
+            //a6 ldx zp0 3
+            //a8 tay imp 2
+            //a9 lda imm 2
+            //aa tax imp 2
+            //ac ldy abs 4
+            //ad lda abs 4
+            //ae ldx abs 4
+
+            //high nibble 0xb
+            //b0 bcs rel 2
+            //b1 lda izy 5
+            //b4 ldy zpx 4
+            //b5 lda zpx 4
+            //b6 ldx zpy 4
+            //b8 clv imp 2
+            //b9 lda aby 4
+            //ba tsx imp 2
+            //bc ldy abx 4
+            //bd lda abx 4
+            //be ldx aby 4
+
+            //high nibble 0xc
+            //c0 cpy imm 2
+            //c1 cmp izx 6
+            //c4 cpy zp0 3
+            //c5 cmp zp0 3
+            //c6 dec zp0 5
+            //c8 iny imp 2
+            //c9 cmp imm 2
+            //ca dex imp 2
+            //cc cpy abs 4
+            //cd cmp abs 4
+            //ce dec abs 6
+
+            //high nibble 0xd
+            //d0 bne rel 2
+            //d1 cmp izy 5
+            //d5 cmp zpx 4
+            //d6 dec zpx 6
+            //d8 cld imp 2
+            //d9 cmp aby 4
+            //dd cmp abx 4
+            //de dec abx 7
+
+            //high nibble 0xe
+            //e0 cpx imm 2
+            //e1 sbc izx 6
+            //e4 cpx zp0 3
+            //e5 sbc zp0 3
+            //e6 inc zp0 5
+            //e8 inx imp 2
+            //e9 sbc imm 2
+            //ea nop imp 2
+            //ec cpx abs 4
+            //ed sbc abs 4
+            //ee inc abs 6
+
+            //hgh nibble 0xf
+            //f0 beq rel 2
+            //f1 sbc izy 5
+            //f5 sbc zpx 4
+            //f6 inc zpx 6
+            //f8 sed imp 2
+            //f9 sbc aby 4
+            //fd sbc abx 4
+            //fe inc abx 7
+
+        }
+
 
     }
 
@@ -887,7 +1516,7 @@ public class CPU{
     // Instruction : Return from Subroutine
     // Function :
     // pull PC, PC+1 -> PC
-    private byte RTC(){
+    private byte RTS(){
         stackPointer++;
         byte lo_pc = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         stackPointer++;
