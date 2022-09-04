@@ -739,16 +739,71 @@ public class CPU{
 
             //high nibble 0xb
             //b0 bcs rel 2
+            else if ((opcode & 0xff) == 0xB0) {
+                extraCycleA = REL();
+                extraCycleB = BCS();
+                cycles = 2;
+            }
             //b1 lda izy 5
+            else if ((opcode & 0xff) == 0xB1) {
+                extraCycleA = IZY();
+                extraCycleB = LDA();
+                cycles = 5;
+            }
             //b4 ldy zpx 4
+            else if ((opcode & 0xff) == 0xB2) {
+                extraCycleA = ZPX();
+                extraCycleB = LDY();
+                cycles = 4;
+            }
             //b5 lda zpx 4
+            else if ((opcode & 0xff) == 0xB5) {
+                extraCycleA = ZPX();
+                extraCycleB = LDA();
+                cycles = 4;
+            }
             //b6 ldx zpy 4
+            else if ((opcode & 0xff) == 0xB6) {
+                extraCycleA = ZPY();
+                extraCycleB = LDX();
+                cycles = 4;
+            }
             //b8 clv imp 2
+            else if ((opcode & 0xff) == 0xB8) {
+                extraCycleA = IMP();
+                extraCycleB = CLV();
+                cycles = 2;
+            }
             //b9 lda aby 4
+            else if ((opcode & 0xff) == 0xB9) {
+                extraCycleA = ABY();
+                extraCycleB = LDA();
+                cycles = 4;
+            }
             //ba tsx imp 2
+            else if ((opcode & 0xff) == 0xBA) {
+                extraCycleA = IMP();
+                extraCycleB = TSX();
+                cycles = 2;
+            }
             //bc ldy abx 4
+            else if ((opcode & 0xff) == 0xBC) {
+                extraCycleA = ABX();
+                extraCycleB = LDY();
+                cycles = 4;
+            }
             //bd lda abx 4
+            else if ((opcode & 0xff) == 0xBD) {
+                extraCycleA = ABX();
+                extraCycleB = LDA();
+                cycles = 4;
+            }
             //be ldx aby 4
+            else if ((opcode & 0xff) == 0xBE) {
+                extraCycleA = ABY();
+                extraCycleB = LDX();
+                cycles = 4;
+            }
 
             //high nibble 0xc
             //c0 cpy imm 2
