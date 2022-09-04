@@ -807,16 +807,71 @@ public class CPU{
 
             //high nibble 0xc
             //c0 cpy imm 2
+            else if ((opcode & 0xff) == 0xC0) {
+                extraCycleA = IMM();
+                extraCycleB = CPY();
+                cycles = 2;
+            }
             //c1 cmp izx 6
+            else if ((opcode & 0xff) == 0xC1) {
+                extraCycleA = IZX();
+                extraCycleB = CMP();
+                cycles = 6;
+            }
             //c4 cpy zp0 3
+            else if ((opcode & 0xff) == 0xC4) {
+                extraCycleA = ZP0();
+                extraCycleB = CPY();
+                cycles = 3;
+            }
             //c5 cmp zp0 3
+            else if ((opcode & 0xff) == 0xC5) {
+                extraCycleA = ZP0();
+                extraCycleB = CMP();
+                cycles = 3;
+            }
             //c6 dec zp0 5
+            else if ((opcode & 0xff) == 0xC6) {
+                extraCycleA = ZP0();
+                extraCycleB = DEC();
+                cycles = 5;
+            }
             //c8 iny imp 2
+            else if ((opcode & 0xff) == 0xC8) {
+                extraCycleA = IMP();
+                extraCycleB = INY();
+                cycles = 2;
+            }
             //c9 cmp imm 2
+            else if ((opcode & 0xff) == 0xC9) {
+                extraCycleA = IMM();
+                extraCycleB = CMP();
+                cycles = 2;
+            }
             //ca dex imp 2
+            else if ((opcode & 0xff) == 0xCA) {
+                extraCycleA = IMP();
+                extraCycleB = DEC();
+                cycles = 2;
+            }
             //cc cpy abs 4
+            else if ((opcode & 0xff) == 0xCC) {
+                extraCycleA = ABS();
+                extraCycleB = CPY();
+                cycles = 4;
+            }
             //cd cmp abs 4
+            else if ((opcode & 0xff) == 0xCD) {
+                extraCycleA = ABS();
+                extraCycleB = CMP();
+                cycles = 4;
+            }
             //ce dec abs 6
+            else if ((opcode & 0xff) == 0xCE) {
+                extraCycleA = ABS();
+                extraCycleB = DEC();
+                cycles = 6;
+            }
 
             //high nibble 0xd
             //d0 bne rel 2
