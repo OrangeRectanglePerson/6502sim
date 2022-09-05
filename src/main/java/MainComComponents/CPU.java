@@ -2,8 +2,6 @@ package MainComComponents;
 
 import Extras.UnsignedMath;
 
-import java.lang.reflect.Method;
-import java.util.function.Function;
 
 public class CPU{
 
@@ -22,7 +20,7 @@ public class CPU{
     private short addr_rel = 0x00;   // Represents address offset going from branch instruction [-128,127]
     private byte  opcode = 0x00;   // Is the current instruction byte
     private byte  cycles = 0;	   // Counts how many cycles current instruction has remaining
-    private int clock_count = 0;	// Accumulation of the number of clocks
+    public int clock_count = 0;	// Accumulation of the number of clocks
     private short temp = 0x0000; // temporary variable for stuff
     private boolean isIMP = false; //is addressing mode IMPlied?
 
@@ -83,7 +81,7 @@ public class CPU{
          * 3) set number of cycles needed
          * 4) set/execute/choose addressing mode (store returned byte in variable "extraCycleA")
          * 5) perform operation (store returned byte in variable "extraCycleB")
-         * 6) if both extraCycleA & B are 1 then add additional cycle to cycle count
+         * 6) if both extraCycleA & B == true then add additional cycle to cycle count
          *
          * [3, 4 & 5 will be painful because there are 150+ possible combinations and i don't think arrays of
          * method references exist in java]
@@ -93,7 +91,7 @@ public class CPU{
          * 2) increase clock count variable (it stores total num of clocks the cpu has run)
          */
 
-        byte extraCycleA, extraCycleB;
+        boolean extraCycleA, extraCycleB;
         if(cycles <= 0){
             //1
             opcode = activelyRead(programCounter);
@@ -391,52 +389,52 @@ public class CPU{
 
             //high nibble 0x5
             //50 bvc rel 2
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x50) {
+                extraCycleA = REL();
+                extraCycleB = BVC();
+                cycles = 2;
             }
             //51 eor izy 5
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x51) {
+                extraCycleA = IZY();
+                extraCycleB = EOR();
+                cycles = 5;
             }
             //55 eor zpx 4
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x55) {
+                extraCycleA = ZPX();
+                extraCycleB = EOR();
+                cycles = 4;
             }
             //56 lsr zpx 6
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
+            else if ((opcode & 0xff) == 0x56) {
+                extraCycleA = ZPX();
                 extraCycleB = LSR();
                 cycles = 6;
             }
             //58 cli imp 2
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x58) {
+                extraCycleA = IMP();
+                extraCycleB = CLI();
+                cycles = 2;
             }
             //59 eor aby 4
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x59) {
+                extraCycleA = ABY();
+                extraCycleB = EOR();
+                cycles = 4;
             }
             //5d eor abx 4
-            else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
-                extraCycleB = LSR();
-                cycles = 6;
+            else if ((opcode & 0xff) == 0x5D) {
+                extraCycleA = ABX();
+                extraCycleB = EOR();
+                cycles = 4;
             }
             //5e lsr abx 7
             else if ((opcode & 0xff) == 0x5E) {
-                extraCycleA = ABS();
+                extraCycleA = ABX();
                 extraCycleB = LSR();
-                cycles = 6;
+                cycles = 7;
             }
 
             //high nibble 0x6
@@ -851,7 +849,7 @@ public class CPU{
             //ca dex imp 2
             else if ((opcode & 0xff) == 0xCA) {
                 extraCycleA = IMP();
-                extraCycleB = DEC();
+                extraCycleB = DEX();
                 cycles = 2;
             }
             //cc cpy abs 4
@@ -993,15 +991,69 @@ public class CPU{
 
             //hgh nibble 0xf
             //f0 beq rel 2
+            else if ((opcode & 0xff) == 0xF0) {
+                extraCycleA = REL();
+                extraCycleB = BEQ();
+                cycles = 2;
+            }
             //f1 sbc izy 5
+            else if ((opcode & 0xff) == 0xF1) {
+                extraCycleA = IZY();
+                extraCycleB = SBC();
+                cycles = 5;
+            }
             //f5 sbc zpx 4
+            else if ((opcode & 0xff) == 0xF5) {
+                extraCycleA = ZPX();
+                extraCycleB = SBC();
+                cycles = 4;
+            }
             //f6 inc zpx 6
+            else if ((opcode & 0xff) == 0xF6) {
+                extraCycleA = ZPX();
+                extraCycleB = INC();
+                cycles = 6;
+            }
             //f8 sed imp 2
+            else if ((opcode & 0xff) == 0xF8) {
+                extraCycleA = IMP();
+                extraCycleB = SED();
+                cycles = 2;
+            }
             //f9 sbc aby 4
+            else if ((opcode & 0xff) == 0xF9) {
+                extraCycleA = ABY();
+                extraCycleB = SBC();
+                cycles = 4;
+            }
             //fd sbc abx 4
+            else if ((opcode & 0xff) == 0xFD) {
+                extraCycleA = ABX();
+                extraCycleB = SBC();
+                cycles = 4;
+            }
             //fe inc abx 7
+            else if ((opcode & 0xff) == 0xFE) {
+                extraCycleA = ABX();
+                extraCycleB = INC();
+                cycles = 7;
+            }
+
+            //for invalid opcodes
+            else{
+                extraCycleA = IMP();
+                extraCycleB = XXX();
+                cycles = 2;
+            }
+
+            if (extraCycleA & extraCycleB) cycles++;
 
         }
+
+        //finally
+
+        cycles--;
+        clock_count++;
 
 
     }
@@ -1013,86 +1065,86 @@ public class CPU{
     //Implied
     //no input is needed by the instruction (e.g. set status bit)
     //fetch A ofr instruction like PHA
-    private byte IMP(){
+    private boolean IMP(){
         isIMP = true;
         fetched = a;
-        return 0;
+        return false;
     }
 
     //Immediate
     //fetch the value after the instruction byte
     //load address of this value into addr_abs
     //then advance program counter to next address
-    private byte IMM() {
+    private boolean IMM() {
         isIMP = false;
         addr_abs = programCounter++;
-        return 0;
+        return false;
     }
 
     //Zero Page
     //Access adress 0x0000 to 0x00FF (this means only 1 byte is needed to be fetched)
     //(this exists to save ROM space)
-    private byte ZP0(){
+    private boolean ZP0(){
         isIMP = false;
         addr_abs = activelyRead(programCounter);
         programCounter++;
         addr_abs &= 0x00ff; // make sure high byte is empty
-        return 0;
+        return false;
     }
 
     //Zero Page X Offset
     //Like Zero Page but the value in X is added to address read
     //(Accessible address range is still only 0x0000 to 0x00FF)
-    private byte ZPX(){
+    private boolean ZPX(){
         isIMP = false;
         //do unsigned addition of x and byte at pc
         addr_abs = UnsignedMath.addByte(activelyRead(programCounter),x);
         programCounter++;
         addr_abs &= 0x00ff; // make sure high byte is empty
-        return 0;
+        return false;
     }
 
     //Zero Page Y Offset
     //Like Zero Page but the value in Y is added to address read
     //(Accessible address range is still only 0x0000 to 0x00FF)
-    private byte ZPY(){
+    private boolean ZPY(){
         isIMP = false;
         //do unsigned addition of y and byte at pc
         addr_abs = UnsignedMath.addByte(activelyRead(programCounter),y);
         programCounter++;
         addr_abs &= 0x00ff; // make sure high byte is empty
-        return 0;
+        return false;
     }
 
     //Relative
     //This address mode is for branch instructions.
     //The address must reside within -128 to +127 of the branch instruction.
-    private byte REL(){
+    private boolean REL(){
         isIMP = false;
         addr_rel = activelyRead(programCounter);
         programCounter++;
         if((addr_rel & 0x8000) == 0x8000){
             addr_rel |= 0xff00;
         }
-        return 0;
+        return false;
     }
 
     //Absolute
     //next two bites are read in order of low->high
-    private byte ABS(){
+    private boolean ABS(){
         isIMP = false;
         byte low = activelyRead(programCounter);
         programCounter++;
         byte high = activelyRead(programCounter);
         programCounter++;
         addr_abs = UnsignedMath.byteToShort(high,low); //shift high byte up 8 bits then or in the low byte
-        return 0;
+        return false;
     }
 
     //Absolute with x offset
     //absolute adressing but add X to the address
     //if addition chacnges the high byte then add 1 clock cycle
-    private byte ABX(){
+    private boolean ABX(){
         isIMP = false;
         byte low = activelyRead(programCounter);
         programCounter++;
@@ -1100,12 +1152,11 @@ public class CPU{
         programCounter++;
         addr_abs = UnsignedMath.byteToShort(high,low); //shift high byte up 8 bits then or in the low byte
         addr_abs = UnsignedMath.addShort(addr_abs,x);
-        if((addr_abs & 0xff00) != UnsignedMath.byteToShort(high,(byte)0)) return 1;
-        else return 0;
+        return (addr_abs & 0xff00) != UnsignedMath.byteToShort(high, (byte) 0);
     }
 
     //absolute with y offset
-    private byte ABY(){
+    private boolean ABY(){
         isIMP = false;
         byte low = activelyRead(programCounter);
         programCounter++;
@@ -1113,8 +1164,7 @@ public class CPU{
         programCounter++;
         addr_abs = UnsignedMath.byteToShort(high,low); //shift high byte up 8 bits then or in the low byte
         addr_abs = UnsignedMath.addShort(addr_abs,y);
-        if((addr_abs & 0xff00) != UnsignedMath.byteToShort(high,(byte)0)) return 1;
-        else return 0;
+        return (addr_abs & 0xff00) != UnsignedMath.byteToShort(high, (byte) 0);
     }
 
     //indirect addressing [pointers]
@@ -1122,7 +1172,7 @@ public class CPU{
     //To be accurate, a bug has to be emulated:
     //If the low byte of the supplied address is 0xFF,
     //high byte is read from 0xXX00 where XX is high byte of pointer
-    private byte IND(){
+    private boolean IND(){
         isIMP = false;
         byte ptr_low = activelyRead(programCounter);
         programCounter++;
@@ -1137,13 +1187,13 @@ public class CPU{
         else { //"normal" functionality
             addr_abs = (short)((activelyRead((short) (ptr + 1)) << 8) | activelyRead(ptr));
         }
-        return 0;
+        return false;
     }
 
     //indirect (zero page x)
     //The supplied 8-bit address is offset by X Register to index a location with high byte 0x00
     //"actual" 2 byte addr is then read from there
-    private byte IZX(){
+    private boolean IZX(){
         isIMP = false;
         short zp_ptr = UnsignedMath.byteToShort(activelyRead(programCounter));
         programCounter++;
@@ -1157,14 +1207,14 @@ public class CPU{
 
         addr_abs = UnsignedMath.byteToShort(high,low);
 
-        return 0;
+        return false;
     }
 
     //(Indirect zero page) Y
     //The supplied 8-bit address indexes a location in page 0x00
     //Y register is added to adress at 0x00XX
     //if offset causes high byte to change, extra clock cycle needed
-    private byte IZY(){
+    private boolean IZY(){
         isIMP = false;
         short zp_ptr = UnsignedMath.byteToShort(activelyRead(programCounter));
         programCounter++;
@@ -1175,8 +1225,7 @@ public class CPU{
         addr_abs = UnsignedMath.byteToShort(high,low);
         addr_abs = UnsignedMath.addShort(addr_abs,UnsignedMath.byteToShort(y));
 
-        if((addr_abs & 0xff00) != UnsignedMath.byteToShort(high,(byte)0)) return 1;
-        else return 0;
+        return (addr_abs & 0xff00) != UnsignedMath.byteToShort(high, (byte) 0);
     }
 
     //fetch the data from the address into fetched
@@ -1209,7 +1258,7 @@ public class CPU{
     // Negative Number + Negative Number = Negative Result -> OK! NO Overflow
     // NOTE!
     // THE OVERFLOW FLAG IS FOR OVERFLOW IF TEH ADDITION WAS SIGNED
-    private byte ADC(){
+    private boolean ADC(){
         //fetch data
         fetch();
 
@@ -1244,13 +1293,13 @@ public class CPU{
         a = (byte) temp;
 
         // This instruction has the potential to require an additional clock cycle
-        return 1;
+        return true;
     }
 
     // Instruction: Subtraction with Borrow In
     // Function: A = A - M - (1 - C)
     // Flags Out: C, V, N, Z
-    private byte SBC(){
+    private boolean SBC(){
         //fetch the data
         fetch();
 
@@ -1276,7 +1325,7 @@ public class CPU{
         a = (byte) temp;
 
         // This instruction has the potential to require an additional clock cycle
-        return 1;
+        return true;
     }
 
     // how to opcode
@@ -1284,23 +1333,23 @@ public class CPU{
     // 2) Perform calculation
     // 3) Store the result in desired place
     // 4) Set Flags of the status register
-    // 5) Return 1 if instruction has potential to require additional clock cycle
+    // 5) return true if instruction has potential to require additional clock cycle
 
     // Instruction: Bitwise Logic AND
     // Function:    A = A & F
     // Flags Out:   N, Z
-    private byte AND(){
+    private boolean AND(){
         fetch();
         a = (byte)(a & fetched);
         setFlag(CPUFlags.ZERO, a == 0b0000_0000);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Arithmetic Shift Left
     // Function:    A = C <- (A << 1) <- 0
     // Flags Out:   N, Z, C
-    private byte ASL(){
+    private boolean ASL(){
         fetch();
 
         temp = (short)(UnsignedMath.byteToShort(fetched) << 1);
@@ -1308,12 +1357,12 @@ public class CPU{
         setFlag(CPUFlags.ZERO, (temp & 0b0000_0000_1111_1111) == 0b0000_0000_0000_0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b0000_0000_1000_0000) == 0b0000_0000_1000_0000);
 
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Carry Clear
     // Function:    if(C == 0) pc = address
-    private byte BCC(){
+    private boolean BCC(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.CARRY) == 0)
         {
@@ -1324,13 +1373,13 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Carry Set
     // Function:    if(C == 1) pc = address
     // literally the op above but c = 1
-    private byte BCS(){
+    private boolean BCS(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.CARRY) == 1)
         {
@@ -1341,12 +1390,12 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Result Zero
     // Function:    if(Z == 1) pc = address
-    private byte BEQ(){
+    private boolean BEQ(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.ZERO) == 1)
         {
@@ -1357,25 +1406,25 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Test Bits in Memory with Accumulator
     // bits 7 and 6 of operand are transferred to bit 7 and 6 of SR (N,V);
     // the zero-flag is set to the result of operand AND accumulator.
     // A AND M, F7 -> N, F6 -> V
-    private byte BIT(){
+    private boolean BIT(){
         fetch();
         temp = UnsignedMath.byteToShort((byte)(a & fetched));
         setFlag(CPUFlags.ZERO, (temp & 0b00000000_11111111) == 0);
         setFlag(CPUFlags.NEGATIVE, (fetched & 0b1000_0000) == 0b1000_0000);
         setFlag(CPUFlags.OVERFLOW, (fetched & 0b0100_0000) == 0b0100_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Negative
     // Function:    if(N == 1) pc = address
-    private byte BMI(){
+    private boolean BMI(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.NEGATIVE) == 1)
         {
@@ -1386,12 +1435,12 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Not Equal
     // Function:    if(Z == 0) pc = address
-    private byte BNE(){
+    private boolean BNE(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.ZERO) == 0)
         {
@@ -1402,12 +1451,12 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Positive
     // Function:    if(N == 0) pc = address
-    private byte BPL(){
+    private boolean BPL(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.NEGATIVE) == 0)
         {
@@ -1418,7 +1467,7 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Force Break
@@ -1430,7 +1479,7 @@ public class CPU{
     // The interrupt disable flag is not set automatically.
     // interrupt, push PC+2, push StatR
 
-    private byte BRK()
+    private boolean BRK()
     {
         programCounter++;
 
@@ -1447,12 +1496,12 @@ public class CPU{
 
         programCounter = (short) (UnsignedMath.byteToShort(this.activelyRead((short) 0xFFFE))
                                     | (this.activelyRead((short) 0xFFFF) << 8));
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Overflow Clear
     // Function:    if(V == 0) pc = address
-    private byte BVC(){
+    private boolean BVC(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.OVERFLOW) == 0)
         {
@@ -1463,12 +1512,12 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Branch if Overflow Set
     // Function:    if(V == 1) pc = address
-    private byte BVS(){
+    private boolean BVS(){
         //uses the relative addr mode so no fetch needed
         if (getFlag(CPUFlags.OVERFLOW) == 1)
         {
@@ -1479,159 +1528,159 @@ public class CPU{
 
             programCounter = addr_abs;
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Clear Carry Flag
     // Function:    C = 0
-    private byte CLC() {
+    private boolean CLC() {
         setFlag(CPUFlags.CARRY,false);
-        return 0;
+        return false;
     }
 
     // Instruction: Clear Decimal Flag
     // Function:    D = 0
-    private byte CLD() {
+    private boolean CLD() {
         setFlag(CPUFlags.DECIMAL,false);
-        return 0;
+        return false;
     }
 
     // Instruction: Clear Interrupt Flag / disable interrupts
     // Function:    I = 0
-    private byte CLI() {
+    private boolean CLI() {
         setFlag(CPUFlags.D_INTERRUPT,false);
-        return 0;
+        return false;
     }
 
     // Instruction: Clear Overflow Flag
     // Function:    V = 0
-    private byte CLV() {
+    private boolean CLV() {
         setFlag(CPUFlags.OVERFLOW,false);
-        return 0;
+        return false;
     }
 
     // Instruction: Compare Accumulator
     // Function:    C <- A >= F      Z <- (A - F) == 0
     // Flags Out:   N, C, Z
-    private byte CMP() {
+    private boolean CMP() {
         fetch();
         temp = (short)(UnsignedMath.byteToShort(a) - UnsignedMath.byteToShort(fetched));
         setFlag(CPUFlags.CARRY, a >= fetched);
         setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0x0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Compare X
     // Function:    C <- X >= F      Z <- (X - F) == 0
     // Flags Out:   N, C, Z
-    private byte CPX() {
+    private boolean CPX() {
         fetch();
         temp = (short)(UnsignedMath.byteToShort(x) - UnsignedMath.byteToShort(fetched));
         setFlag(CPUFlags.CARRY, x >= fetched);
         setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0x0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Compare Y
     // Function:    C <- Y >= F      Z <- (Y - F) == 0
     // Flags Out:   N, C, Z
-    private byte CPY() {
+    private boolean CPY() {
         fetch();
         temp = (short)(UnsignedMath.byteToShort(y) - UnsignedMath.byteToShort(fetched));
         setFlag(CPUFlags.CARRY, y >= fetched);
         setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0x0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Decrement Value at Memory Location
     // Function:    F = F - 1
     // Flags Out:   N, Z
-    private byte DEC() {
+    private boolean DEC() {
         fetch();
         temp = UnsignedMath.byteToShort((byte) (fetched-1));
         this.activelyWrite(addr_abs, (byte)temp);
         setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0x0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Decrement X
     // Function:    X = X - 1
     // Flags Out:   N, Z
-    private byte DEX() {
+    private boolean DEX() {
         x--;
         setFlag(CPUFlags.ZERO, x == 0x00);
         setFlag(CPUFlags.NEGATIVE, (x & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Decrement Y
     // Function:    Y = Y - 1
     // Flags Out:   N, Z
-    private byte DEY() {
+    private boolean DEY() {
         y--;
         setFlag(CPUFlags.ZERO, y == 0x00);
         setFlag(CPUFlags.NEGATIVE, (y & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Bitwise Logic XOR
     // Function:    A = A xor F
     // Flags Out:   N, Z
-    private byte EOR(){
+    private boolean EOR(){
         fetch();
         a ^= fetched;
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Increment Value at Memory Location
     // Function:    F = F + 1
     // Flags Out:   N, Z
-    private byte INC() {
+    private boolean INC() {
         fetch();
         temp = UnsignedMath.byteToShort((byte) (fetched+1));
         this.activelyWrite(addr_abs, (byte)temp);
         setFlag(CPUFlags.ZERO, (temp & 0x00FF) == 0x0000);
         setFlag(CPUFlags.NEGATIVE, (temp & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Increment X
     // Function:    X = X + 1
     // Flags Out:   N, Z
-    private byte INX() {
+    private boolean INX() {
         x++;
         setFlag(CPUFlags.ZERO, x == 0x00);
         setFlag(CPUFlags.NEGATIVE, (x & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Increment Y
     // Function:    Y = Y + 1
     // Flags Out:   N, Z
-    private byte INY() {
+    private boolean INY() {
         y++;
         setFlag(CPUFlags.ZERO, y == 0x00);
         setFlag(CPUFlags.NEGATIVE, (y & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Jump To Location
     // Function:    pc = address
-    private byte JMP() {
+    private boolean JMP() {
         // no need to fetch data since data ahead is already fetched into addr_abd (IND) or in next 2 bytes (ABS)
         programCounter = addr_abs;
-        return 0;
+        return false;
     }
 
     // Instruction: Jump To Sub-Routine
     // Function:    Push current pc to stack, pc = address
-    private byte JSR(){
+    private boolean JSR(){
         programCounter --;
 
         this.activelyWrite((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)), (byte)((programCounter >>> 8) & 0x00FF));
@@ -1640,46 +1689,46 @@ public class CPU{
         stackPointer--;
 
         programCounter = addr_abs;
-        return 0;
+        return false;
     }
 
     // Instruction: Fetch Into The Accumulator
     // Function:    A = F
     // Flags Out:   N, Z
-    private byte LDA(){
+    private boolean LDA(){
         fetch();
         a = fetched;
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Fetch Into X
     // Function:    X = F
     // Flags Out:   N, Z
-    private byte LDX(){
+    private boolean LDX(){
         fetch();
         x = fetched;
         setFlag(CPUFlags.ZERO, x == 0x00);
         setFlag(CPUFlags.NEGATIVE, (x & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Fetch Into Y
     // Function:    Y = F
     // Flags Out:   N, Z
-    private byte LDY(){
+    private boolean LDY(){
         fetch();
         y = fetched;
         setFlag(CPUFlags.ZERO, y == 0x00);
         setFlag(CPUFlags.NEGATIVE, (y & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Shift Fetched or A One Bit Right
     // Function: 0 -> [76543210] -> C
     // Flags Out:  C, N = 0, Z
-    private byte LSR(){
+    private boolean LSR(){
         fetch();
         setFlag(CPUFlags.CARRY, (fetched & 0b1) == 0b1);
         temp = (short)(fetched >>> 1);
@@ -1690,82 +1739,76 @@ public class CPU{
         } else {
             this.activelyWrite(addr_abs,(byte)temp);
         }
-        return 0;
+        return false;
     }
 
     // NOP
     // some "illegal" NOPs can take extra cycle
-    private byte NOP(){
-        switch (opcode){
+    private boolean NOP(){
+        return switch (opcode) {
             //"illegal" NOPs
-            case 0x1C:
-            case 0x3C:
-            case 0x5C:
-            case 0x7C:
-            case (byte) 0xDC:
-            case (byte) 0xFC:
-                return 1;
-        }
-        return 0;
+            case 0x1C, 0x3C, 0x5C, 0x7C, (byte) 0xDC, (byte) 0xFC -> true;
+            default -> false;
+        };
     }
 
     // Instruction: Bitwise Logic OR
     // Function:    A = A | F
     // Flags Out:   N, Z
-    private byte ORA(){
+    private boolean ORA(){
         fetch();
         a |= fetched;
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 1;
+        return true;
     }
 
     // Instruction: Push Accumulator to Stack
     // Function:    A -> stack
-    private byte PHA(){
+    private boolean PHA(){
         this.activelyWrite((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)), a);
         stackPointer--;
-        return 0;
+        return false;
     }
 
     // Instruction: Push Stat Reg to Stack
     // Function:    SR -> stack
     // break flag & unused set before push
-    private byte PHP(){
+    private boolean PHP(){
         this.activelyWrite((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)),
                             (byte)(stat_regs | CPUFlags.BREAK.getPosition() | CPUFlags.UNUSED.getPosition()));
         setFlag(CPUFlags.BREAK,false);
         setFlag(CPUFlags.UNUSED, true);
         stackPointer--;
-        return 0;
+        return false;
     }
 
     // Instruction: Pop Accumulator off Stack
     // Function:    A <- stack
     // Flags Out:   N, Z
-    private byte PLA(){
+    private boolean PLA(){
         stackPointer++;
         a = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Pop Stat Reg off Stack
     // Function:    SR <- stack
     // break flag and bit 5 ignored.
-    private byte PLP(){
+    private boolean PLP(){
         stackPointer++;
         byte origBreakFlag = getFlag(CPUFlags.BREAK);
         stat_regs = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         setFlag(CPUFlags.UNUSED, true);
         setFlag(CPUFlags.BREAK , origBreakFlag != 0);
-        return 0;
+        return false;
     }
 
     // Instruction: Rotate One Bit Left (Memory or Accumulator)
     // Function: C <- [76543210] <- C
-    private byte ROL(){
+    private boolean ROL(){
         fetch();
         temp = (short) ((fetched << 1) | getFlag(CPUFlags.CARRY));
         setFlag(CPUFlags.CARRY, (temp & 0b1_0000_0000) == 0b1_0000_0000);
@@ -1776,12 +1819,12 @@ public class CPU{
         } else {
             this.activelyWrite(addr_abs, (byte) temp);
         }
-        return 0;
+        return false;
     }
 
     // Instruction: Rotate One Bit Right (Memory or Accumulator)
     // Function: C -> [76543210] -> C
-    private byte ROR(){
+    private boolean ROR(){
         fetch();
         temp = (short) ((getFlag(CPUFlags.CARRY) << 7) | (fetched >>> 1));
         setFlag(CPUFlags.CARRY, (fetched & 0b1) == 0b1);
@@ -1792,7 +1835,7 @@ public class CPU{
         } else {
             this.activelyWrite(addr_abs, (byte) temp);
         }
-        return 0;
+        return false;
     }
 
     // Instruction : Return from interrupt
@@ -1800,7 +1843,7 @@ public class CPU{
     // The status register is pulled with the break flag and bit 5 ignored.
     // Then PC is pulled from the stack.
     // pull SR, pull PC
-    private byte RTI(){
+    private boolean RTI(){
         //pull SR
         byte origBreakFlag = getFlag(CPUFlags.BREAK);
         stackPointer++;
@@ -1815,128 +1858,128 @@ public class CPU{
         byte hi_pc = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         programCounter = UnsignedMath.byteToShort(hi_pc,lo_pc);
 
-        return 0;
+        return false;
     }
 
     // Instruction : Return from Subroutine
     // Function :
     // pull PC, PC+1 -> PC
-    private byte RTS(){
+    private boolean RTS(){
         stackPointer++;
         byte lo_pc = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         stackPointer++;
         byte hi_pc = this.activelyRead((short)(0x0100 + UnsignedMath.byteToShort(stackPointer)));
         programCounter = UnsignedMath.byteToShort(hi_pc,lo_pc);
         programCounter++;
-        return 0;
+        return false;
     }
 
     // Instruction: Set Carry Flag
     // Function:    C = 1
-    private byte SEC()
+    private boolean SEC()
     {
         setFlag(CPUFlags.CARRY, true);
-        return 0;
+        return false;
     }
 
     // Instruction: Set Decimal Flag
     // Function:    D = 1
-    private byte SED()
+    private boolean SED()
     {
         setFlag(CPUFlags.DECIMAL, true);
-        return 0;
+        return false;
     }
 
     // Instruction: Set Interrupt Flag/ ENable Interrupt
     // Function:    I = 1
-    private byte SEI()
+    private boolean SEI()
     {
         setFlag(CPUFlags.D_INTERRUPT, true);
-        return 0;
+        return false;
     }
 
     // Instruction: Store Accumulator at Address
     // Function:    F = A
-    private byte STA(){
+    private boolean STA(){
         this.activelyWrite(addr_abs, a);
-        return 0;
+        return false;
     }
 
     // Instruction: Store X at Address
     // Function:    F = X
-    private byte STX(){
+    private boolean STX(){
         this.activelyWrite(addr_abs, x);
-        return 0;
+        return false;
     }
 
     // Instruction: Store Y at Address
     // Function:    F = Y
-    private byte STY(){
+    private boolean STY(){
         this.activelyWrite(addr_abs, y);
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer A to X
     // Function:    X = A
     // Flags Out:   N, Z
-    private byte TAX(){
+    private boolean TAX(){
         x = a;
         setFlag(CPUFlags.ZERO, x == 0x00);
         setFlag(CPUFlags.NEGATIVE, (x & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer A to y
     // Function:    Y = A
     // Flags Out:   N, Z
-    private byte TAY(){
+    private boolean TAY(){
         y = a;
         setFlag(CPUFlags.ZERO, y == 0x00);
         setFlag(CPUFlags.NEGATIVE, (y & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer StkP to x
     // Function:    X = SP
     // Flags Out:   N, Z
-    private byte TSX(){
+    private boolean TSX(){
         x = stackPointer;
         setFlag(CPUFlags.ZERO, x == 0x00);
         setFlag(CPUFlags.NEGATIVE, (x & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer X to A
     // Function:    A = X
     // Flags Out:   N, Z
-    private byte TXA(){
+    private boolean TXA(){
         a = x;
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer X to StkP
     // Function:    SP = X
-    private byte TXS(){
+    private boolean TXS(){
         stackPointer = x;
-        return 0;
+        return false;
     }
 
     // Instruction: Transfer Y to A
     // Function:    A = Y
     // Flags Out:   N, Z
-    private byte TYA(){
+    private boolean TYA(){
         a = y;
         setFlag(CPUFlags.ZERO, a == 0x00);
         setFlag(CPUFlags.NEGATIVE, (a & 0b1000_0000) == 0b1000_0000);
-        return 0;
+        return false;
     }
 
     //Illegal Opcode function
-    private byte XXX(){
+    private boolean XXX(){
         // TODO: 14/8/2022 Add error handling stuff here i guess
-        return 0;
+        return false;
     }
 
 
