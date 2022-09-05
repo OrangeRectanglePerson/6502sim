@@ -20,7 +20,7 @@ public class CPU{
     private short addr_rel = 0x00;   // Represents address offset going from branch instruction [-128,127]
     private byte  opcode = 0x00;   // Is the current instruction byte
     private byte  cycles = 0;	   // Counts how many cycles current instruction has remaining
-    public int clock_count = 0;	// Accumulation of the number of clocks
+    public int clock_count = 0;	// Accumulation of the number of clocks [public for debugging stuff]
     private short temp = 0x0000; // temporary variable for stuff
     private boolean isIMP = false; //is addressing mode IMPlied?
 
