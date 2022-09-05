@@ -875,13 +875,53 @@ public class CPU{
 
             //high nibble 0xd
             //d0 bne rel 2
+            else if ((opcode & 0xff) == 0xD0) {
+                extraCycleA = REL();
+                extraCycleB = BNE();
+                cycles = 2;
+            }
             //d1 cmp izy 5
+            else if ((opcode & 0xff) == 0xD1) {
+                extraCycleA = IZY();
+                extraCycleB = CMP();
+                cycles = 5;
+            }
             //d5 cmp zpx 4
+            else if ((opcode & 0xff) == 0xD5) {
+                extraCycleA = ZPX();
+                extraCycleB = CMP();
+                cycles = 4;
+            }
             //d6 dec zpx 6
+            else if ((opcode & 0xff) == 0xD6) {
+                extraCycleA = ZPX();
+                extraCycleB = DEC();
+                cycles = 6;
+            }
             //d8 cld imp 2
+            else if ((opcode & 0xff) == 0xD8) {
+                extraCycleA = IMP();
+                extraCycleB = CLD();
+                cycles = 2;
+            }
             //d9 cmp aby 4
+            else if ((opcode & 0xff) == 0xD9) {
+                extraCycleA = ABY();
+                extraCycleB = CMP();
+                cycles = 4;
+            }
             //dd cmp abx 4
+            else if ((opcode & 0xff) == 0xDD) {
+                extraCycleA = ABX();
+                extraCycleB = CMP();
+                cycles = 4;
+            }
             //de dec abx 7
+            else if ((opcode & 0xff) == 0xDE) {
+                extraCycleA = ABX();
+                extraCycleB = DEC();
+                cycles = 7;
+            }
 
             //high nibble 0xe
             //e0 cpx imm 2
