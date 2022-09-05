@@ -925,16 +925,71 @@ public class CPU{
 
             //high nibble 0xe
             //e0 cpx imm 2
+            else if ((opcode & 0xff) == 0xE0) {
+                extraCycleA = IMM();
+                extraCycleB = CPX();
+                cycles = 2;
+            }
             //e1 sbc izx 6
+            else if ((opcode & 0xff) == 0xE1) {
+                extraCycleA = IZX();
+                extraCycleB = SBC();
+                cycles = 2;
+            }
             //e4 cpx zp0 3
+            else if ((opcode & 0xff) == 0xE4) {
+                extraCycleA = ZP0();
+                extraCycleB = CPX();
+                cycles = 3;
+            }
             //e5 sbc zp0 3
+            else if ((opcode & 0xff) == 0xE5) {
+                extraCycleA = ZP0();
+                extraCycleB = SBC();
+                cycles = 3;
+            }
             //e6 inc zp0 5
+            else if ((opcode & 0xff) == 0xE6) {
+                extraCycleA = ZP0();
+                extraCycleB = INC();
+                cycles = 5;
+            }
             //e8 inx imp 2
+            else if ((opcode & 0xff) == 0xE8) {
+                extraCycleA = IMP();
+                extraCycleB = INX();
+                cycles = 2;
+            }
             //e9 sbc imm 2
+            else if ((opcode & 0xff) == 0xE9) {
+                extraCycleA = IMM();
+                extraCycleB = SBC();
+                cycles = 2;
+            }
             //ea nop imp 2
+            else if ((opcode & 0xff) == 0xEA) {
+                extraCycleA = IMP();
+                extraCycleB = NOP();
+                cycles = 2;
+            }
             //ec cpx abs 4
+            else if ((opcode & 0xff) == 0xEC) {
+                extraCycleA = ABS();
+                extraCycleB = CPX();
+                cycles = 4;
+            }
             //ed sbc abs 4
+            else if ((opcode & 0xff) == 0xED) {
+                extraCycleA = ABS();
+                extraCycleB = SBC();
+                cycles = 4;
+            }
             //ee inc abs 6
+            else if ((opcode & 0xff) == 0xEE) {
+                extraCycleA = ABS();
+                extraCycleB = INC();
+                cycles = 6;
+            }
 
             //hgh nibble 0xf
             //f0 beq rel 2
