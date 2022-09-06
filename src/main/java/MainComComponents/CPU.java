@@ -66,8 +66,8 @@ public class CPU{
 
     //CLOCK, INTERRUPT & RESET
 
+    // here we define what happens in 1 clock cycle
     public void clock() {
-        //here we define what happens in 1 clock cycle
 
         /* we will use the cycles variable here
          * the cycles variable keeps track of how many cycles the current instruction needs left
@@ -1058,9 +1058,40 @@ public class CPU{
 
     }
 
+    // TODO: 6/9/2022 reset, interrupt request, non maskable interrupt
+
+    // here we define what happens when someone triggers the cpu to reset
+    public void reset(){
+        //get default program counter address from  $FFFD (high byte) & $FFFC (low byte)
+        //also set addr_abs to $FFFC to be sure
+        addr_abs = (short) 0xfffc;
+        programCounter = UnsignedMath.byteToShort(this.activelyRead((short)0xfffd), this.activelyRead((short)0xfffc));
+
+        //reset stat regs (all 0 except U always 1)
+        stat_regs = 0b0010_0000;
+        //reset value registers
+        a = 0; x = 0; y = 0;
+        //reset stack pointer (default address 0x01FD (since we store only the low bytes of the stkp, set to 0xFD))
+        stackPointer = (byte)0xFD;
+
+        //reset the emulation variables
+        addr_abs = 0x0000;
+        fetched = 0x00;
+        addr_rel = 0x00;
+        opcode = 0x00;
+        //cycles = 0; (by right this is supposed to be here but IDE did not like redundant assignment)
+        clock_count = 0;
+        temp = 0x0000;
+        isIMP = false;
+
+        //since the reset (or rather the startup after the reset) takes time, we have to set cycles to 8
+        //therefore, first 8 cycles are busy cycles that dont execute instructions
+        cycles = 8;
+    }
+
     //ADDRESSING MODES
-    //methods here wil return bytes
-    //bytes are how many extra clock cycles are needed by adressing mode
+    //methods here wil return boolean
+    //boolean value is how many extra clock cycles are needed by adressing mode
 
     //Implied
     //no input is needed by the instruction (e.g. set status bit)
@@ -1890,7 +1921,7 @@ public class CPU{
         return false;
     }
 
-    // Instruction: Set Interrupt Flag/ ENable Interrupt
+    // Instruction: Set Interrupt Flag/ Enable Interrupt
     // Function:    I = 1
     private boolean SEI()
     {
