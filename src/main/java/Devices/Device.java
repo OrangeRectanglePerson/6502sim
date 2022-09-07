@@ -8,6 +8,9 @@ public abstract class Device {
     short startAddress;
     short endAddress;
 
+    //device name
+    String deviceName;
+
 
     //use when this device is the "master" pushing data onto the bus
     public void activelyWrite(short requestAdr, byte data){
@@ -42,5 +45,12 @@ public abstract class Device {
     }
     public void setEndAddress(short endAddress) {
         this.endAddress = endAddress;
+    }
+
+    @Override
+    public String toString() {
+        String startHex = Integer.toHexString(Short.toUnsignedInt(this.startAddress));
+        String endHex = Integer.toHexString(Short.toUnsignedInt(this.endAddress));
+        return String.format("%s%n0x%4s -> 0x%4s",this.deviceName, startHex, endHex);
     }
 }

@@ -6,7 +6,8 @@ public class RAM extends Device{
     //idk why this warning suppression is needed because storage can be modified in passivelyRead
     private byte[] storage;
 
-    public RAM(short _startAddress, short _endAddress){
+    public RAM(String _name, short _startAddress, short _endAddress){
+        this.deviceName = _name;
         this.setStartAddress(_startAddress);
         this.setEndAddress(_endAddress);
         //create storage of bytes ranging from address start to end addresses (size is end - start + 1 bytes)
@@ -16,7 +17,7 @@ public class RAM extends Device{
     //writes data into the ram
     @Override
     public void passivelyRead(short receiveAdr, byte data) {
-        synchronized (this) { storage[Short.compareUnsigned(this.getStartAddress(),receiveAdr)] = data; }
+        synchronized (this) { storage[Short.compareUnsigned(receiveAdr,this.getStartAddress())] = data; }
     }
 
     //reads data from ram when requested

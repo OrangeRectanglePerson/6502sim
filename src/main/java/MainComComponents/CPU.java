@@ -25,7 +25,34 @@ public class CPU{
     private boolean isIMP = false; //is addressing mode IMPlied?
 
     public CPU(){
-        //empty constructor
+        //put the cpu into setup mode (aka reset)
+        this.reset();
+    }
+
+    //getters for GUI thing
+    //A
+    public byte getAccumulator() {
+        return a;
+    }
+    //X
+    public byte getXReg() {
+        return x;
+    }
+    //Y
+    public byte getYReg() {
+        return y;
+    }
+    //PC
+    public short getProgramCounter() {
+        return programCounter;
+    }
+    //SP
+    public byte getStackPointer() {
+        return stackPointer;
+    }
+    //StatReg
+    public byte getStatRegs() {
+        return stat_regs;
     }
 
     //READ & WRITE FUNCTIONS
@@ -42,7 +69,8 @@ public class CPU{
 
 
     //FLAG FUNCTIONS
-    private byte getFlag(CPUFlags f){
+    public byte getFlag(CPUFlags f){
+        //public for debug GUI purposes
         //return 1 if flag is set, 0 if flag is not set
         return((stat_regs & f.getPosition()) == f.getPosition()) ? (byte)1 : (byte)0;
     }
