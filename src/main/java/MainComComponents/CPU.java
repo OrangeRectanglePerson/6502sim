@@ -25,16 +25,16 @@ public class CPU{
     private boolean isIMP = false; //is addressing mode IMPlied?
 
     public CPU(){
-
+        //empty constructor
     }
 
     //READ & WRITE FUNCTIONS
     //cpu takes data fom an address on the bus
     //e.g. reading opcodes from ROM or reading data from RAM
-    public byte activelyRead(short receiveAdr) { return Bus.serveDataFromAdr(receiveAdr); }
+    public synchronized byte activelyRead(short receiveAdr) { return Bus.serveDataFromAdr(receiveAdr); }
     //cpu writes data to an address on the bus
     //e.g. writing data to RAM, writing graphics to VRAM, setting flags in sound chip
-    public void activelyWrite(short requestAdr, byte data) {
+    public synchronized void activelyWrite(short requestAdr, byte data) {
         Bus.serveDataToAdr(requestAdr,data);
     }
 
@@ -66,8 +66,9 @@ public class CPU{
 
     //CLOCK, INTERRUPT & RESET
 
+    //CLOCK
     // here we define what happens in 1 clock cycle
-    public void clock() {
+    public synchronized void clock() {
 
         /* we will use the cycles variable here
          * the cycles variable keeps track of how many cycles the current instruction needs left
@@ -1058,10 +1059,9 @@ public class CPU{
 
     }
 
-    // TODO: 6/9/2022 reset, interrupt request, non maskable interrupt
-
+    //RESET
     // here we define what happens when someone triggers the cpu to reset
-    public void reset(){
+    public synchronized void reset(){
         //get default program counter address from  $FFFD (high byte) & $FFFC (low byte)
         //also set addr_abs to $FFFC to be sure
         addr_abs = (short) 0xfffc;
@@ -1086,6 +1086,72 @@ public class CPU{
 
         //since the reset (or rather the startup after the reset) takes time, we have to set cycles to 8
         //therefore, first 8 cycles are busy cycles that dont execute instructions
+        cycles = 8;
+    }
+
+    // IRQ
+    // interrupt request
+    // only works if the Disable Interrupt flag is 0 (bit 3 in stat regs)
+    // mechanism of action
+    // 1) push current PC into stack (it's 2 bytes so 2 pushes are needed (push high then low))
+    // 2) push current stat reg byte into stack (set Break to false, Unused to true & DisableInterrupt to true first)
+    // 3) read the new PC from mem location 0xFFFE (0xFFFE > low byte | 0xFFFF > high byte)
+    // IRQ takes 7 cycles to set up
+    public synchronized void IRQ(){
+        if (getFlag(CPUFlags.D_INTERRUPT) == 0){
+            //1
+            //write high byte
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+                    (byte)((programCounter >>> 8) & 0xff));
+            stackPointer--;
+            //write low byte
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+                    (byte)(programCounter& 0xff));
+            stackPointer--;
+
+            //2
+            setFlag(CPUFlags.BREAK, false);
+            setFlag(CPUFlags.UNUSED, true);
+            setFlag(CPUFlags.D_INTERRUPT, true);
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer), stat_regs);
+            stackPointer--;
+
+            //3
+            addr_abs = (short) 0xFFFE;
+            programCounter = UnsignedMath.byteToShort(this.activelyRead((short) (addr_abs+1)), this.activelyRead(addr_abs));
+
+            //4
+            cycles = 7;
+        }
+    }
+
+    // NMI
+    // non maskable interrupt
+    // IRQ but you don't care about the Disable Interrupt flag
+    // it also reads new PC from 0xFFFA & uses 8 cycles
+    public synchronized void NMI(){
+        //1
+        //write high byte
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+                (byte)((programCounter >>> 8) & 0xff));
+        stackPointer--;
+        //write low byte
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+                (byte)(programCounter& 0xff));
+        stackPointer--;
+
+        //2
+        setFlag(CPUFlags.BREAK, false);
+        setFlag(CPUFlags.UNUSED, true);
+        setFlag(CPUFlags.D_INTERRUPT, true);
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer), stat_regs);
+        stackPointer--;
+
+        //3
+        addr_abs = (short) 0xFFFA;
+        programCounter = UnsignedMath.byteToShort(this.activelyRead((short) (addr_abs+1)), this.activelyRead(addr_abs));
+
+        //4
         cycles = 8;
     }
 

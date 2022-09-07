@@ -16,13 +16,13 @@ public class RAM extends Device{
     //writes data into the ram
     @Override
     public void passivelyRead(short receiveAdr, byte data) {
-        storage[Short.compareUnsigned(this.getStartAddress(),receiveAdr)] = data;
+        synchronized (this) { storage[Short.compareUnsigned(this.getStartAddress(),receiveAdr)] = data; }
     }
 
     //reads data from ram when requested
     @Override
     public byte readFromAdr(short requestedAdr) {
-        return storage[Short.compareUnsigned(requestedAdr,this.getStartAddress())];
+        synchronized (this) { return storage[Short.compareUnsigned(requestedAdr,this.getStartAddress())]; }
     }
 
     //ram cannot push data onto bus or forcefully read data from it
