@@ -1,12 +1,14 @@
 package MainComComponents;
 
 import Devices.Device;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 
 public class Bus {
 
-    public static ArrayList<Device> devices = new ArrayList<>();
+    public static ObservableList<Device> devices = FXCollections.observableArrayList();
 
     public static CPU processor;
 

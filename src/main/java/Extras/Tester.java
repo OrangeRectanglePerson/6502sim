@@ -18,7 +18,7 @@ public class Tester {
     }
 
     public static void testRam(){
-        Bus.devices.add(new RAM((short)0x0000,(short)0x00FF));
+        Bus.devices.add(new RAM("um", (short)0x0000,(short)0x00FF));
 
         String debug;
 
