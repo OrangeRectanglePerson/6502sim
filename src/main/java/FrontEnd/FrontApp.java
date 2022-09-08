@@ -29,7 +29,7 @@ public class FrontApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setResizable(true);
-        stage.setTitle("6502 microprocessor microcomputer v0.0");
+        stage.setTitle("6502 microprocessor microcomputer v0.1");
         stage.setScene(scene);
         stage.show();
     }

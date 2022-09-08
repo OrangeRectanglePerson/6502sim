@@ -1071,9 +1071,10 @@ public class CPU{
 
             //for invalid opcodes
             else{
-                extraCycleA = IMP();
-                extraCycleB = XXX();
-                cycles = 2;
+                throw new UnsupportedOperationException(
+                        String.format("Illegal_Opcode_Executed_@_0x%4s", Integer.toHexString(Short.toUnsignedInt(programCounter)-1))
+                                .replace(' ', '0').replace('_',' ')
+                );
             }
 
             if (extraCycleA & extraCycleB) cycles++;
@@ -2104,7 +2105,7 @@ public class CPU{
 
     //Illegal Opcode function
     private boolean XXX(){
-        // TODO: 14/8/2022 Add error handling stuff here i guess
+        //an exception will be thrown from the ifelse ladder above
         return false;
     }
 

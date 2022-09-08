@@ -288,7 +288,16 @@ public class FrontControl {
 
     @FXML
     protected void stepClockOnAction(){
-        Bus.processor.clock();
+        //try to clock
+        //if an illegal opcode is requested, reset the cpu and throw error
+        try{ Bus.processor.clock(); } catch (UnsupportedOperationException uoe) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Illegal Opcode!");
+            a.setHeaderText(uoe.getMessage());
+            a.setContentText("The CPU will Reset");
+            a.showAndWait();
+            this.resetCPUButtonAction();
+        }
         updateDebuggerTA();
         updateRegistersPanel();
         clockCycleCount.setText(String.valueOf(Bus.processor.clock_count));
