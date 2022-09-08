@@ -121,6 +121,7 @@ public class CPU{
          */
 
         boolean extraCycleA, extraCycleB;
+        //do stuff when the previous instruction finishes
         if(cycles <= 0){
             //1
             opcode = activelyRead(programCounter);

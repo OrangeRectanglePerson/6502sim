@@ -1,16 +1,16 @@
 package FrontEnd;
 
 import Devices.Device;
-import Devices.RAM;
 import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 
 public class FrontControl {
 
@@ -36,6 +36,8 @@ public class FrontControl {
     //choicebox for debugger
     @FXML
     private ChoiceBox<Device> debuggerDropdown;
+    @FXML
+    private Button debuggerShowAllButt;
 
     //debugger textarea
     @FXML
@@ -75,6 +77,12 @@ public class FrontControl {
     @FXML
     //initialising method for JFX
     public void initialize() {
+
+        //add tooltip to debuggerShowAllButt
+        Tooltip DSABTooltip = new Tooltip("NOTE!\nTHIS IS VERY UNINTUITIVE AND LAGGY!");
+        DSABTooltip.setStyle("-fx-background-color: red; -fx-text-alignment: center; -fx-font: bold 14 sans-serif");
+        DSABTooltip.setShowDelay(Duration.millis(10));
+        debuggerShowAllButt.setTooltip(DSABTooltip);
 
         //hook choicebox to devices array list;
         debuggerDropdown.setItems(Bus.devices);
@@ -191,7 +199,7 @@ public class FrontControl {
     public void updateDebuggerTA(){
         //debuggerTA.clear();
         StringBuilder sb = new StringBuilder();
-        if(debuggerTA != null) {
+        if(debuggerLookAt != null) {
             short currAddr = debuggerLookAt.getStartAddress();
             currAddr--;
             do {
@@ -292,6 +300,12 @@ public class FrontControl {
         updateDebuggerTA();
         updateRegistersPanel();
         clockCycleCount.setText(String.valueOf(Bus.processor.clock_count));
+    }
+
+    @FXML
+    protected void debuggerShowAllButtAction(){
+        this.debuggerLookAt = null;
+        updateDebuggerTA();
     }
 
 }

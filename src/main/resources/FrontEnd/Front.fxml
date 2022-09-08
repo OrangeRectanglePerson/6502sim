@@ -69,7 +69,12 @@
                         <Font name="Consolas" size="13.5" />
                      </font>
                   </TextArea>
-                  <ChoiceBox fx:id="debuggerDropdown" layoutX="35.0" layoutY="23.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                  <ChoiceBox fx:id="debuggerDropdown" layoutX="35.0" layoutY="23.0" prefHeight="40.0" prefWidth="155.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="10.0" />
+                  <Button fx:id="debuggerShowAllButt" layoutX="160.0" layoutY="18.0" mnemonicParsing="false" onAction="#debuggerShowAllButtAction" prefHeight="40.0" prefWidth="50.0" style="-fx-background-insets: 0;" text="Show&#10;All" textAlignment="CENTER" AnchorPane.leftAnchor="165.0" AnchorPane.topAnchor="10.0">
+                     <font>
+                        <Font name="Consolas Bold" size="13.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane layoutX="220.0" layoutY="30.0" prefHeight="285.0" prefWidth="140.0" style="-fx-background-color: #000080;" AnchorPane.leftAnchor="220.0" AnchorPane.topAnchor="25.0">
