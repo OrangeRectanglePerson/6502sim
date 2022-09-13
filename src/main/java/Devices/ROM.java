@@ -1,12 +1,12 @@
 package Devices;
 
-public class RAM extends Device{
+public class ROM extends Device{
 
     @SuppressWarnings("FieldMayBeFinal")
     //idk why this warning suppression is needed because storage can be modified in passivelyRead
     private byte[] storage;
 
-    public RAM(String _name, short _startAddress, short _endAddress){
+    public ROM(String _name, short _startAddress, short _endAddress){
         this.deviceName = _name;
         this.setStartAddress(_startAddress);
         this.setEndAddress(_endAddress);
@@ -14,21 +14,29 @@ public class RAM extends Device{
         storage = new byte[Short.compareUnsigned(_endAddress,_startAddress)+1];
     }
 
-    //writes data into the ram
-    @Override
-    public void passivelyRead(short receiveAdr, byte data) {
-        synchronized (this) { storage[Short.compareUnsigned(receiveAdr,this.getStartAddress())] = data; }
-    }
 
-    //reads data from ram when requested
+    //reads data from ROM when requested
     @Override
     public byte readFromAdr(short requestedAdr) {
         synchronized (this) { return storage[Short.compareUnsigned(requestedAdr,this.getStartAddress())]; }
     }
 
-    //reset ram data
-    public void resetRAM(){
-        storage = new byte[storage.length];
+    //manually force in data (aka flashing the ROM)
+    //for each byte in the byte array, if there is data to be flashed, flash
+    //else, flash a 0
+    public void flashROM(byte[] _inBytes){
+        for (int i = 0; i < storage.length; i++) {
+            try{
+                storage[i] = _inBytes[i];
+            } catch (IndexOutOfBoundsException ioobe){
+                storage[i] = 0;
+            }
+        }
+    }
+
+    //return number of bytes ROM can store
+    public int getROMSize(){
+        return storage.length;
     }
 
     //ram cannot push data onto bus or forcefully read data from it
@@ -40,5 +48,10 @@ public class RAM extends Device{
     public void activelyWrite(short requestAdr, byte data) {
         super.activelyWrite(requestAdr, data);
     }
+    //no writing data into the ROM
+    @Override
+    public void passivelyRead(short receiveAdr, byte data) {
+    }
+
 
 }

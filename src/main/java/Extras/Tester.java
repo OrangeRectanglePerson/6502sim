@@ -1,11 +1,15 @@
 package Extras;
 
+import Devices.Device;
 import Devices.RAM;
+import Devices.ROM;
 import MainComComponents.Bus;
 
 public class Tester {
     public static void main(String[] args) {
-        misc();
+        Device testROM = new ROM("test", (short) 0x0000, (short) 0x00ff);
+
+        System.out.println(testROM.getClass().getSimpleName());
     }
 
     public static String getDebugString(short lowLimit, short highLimit){

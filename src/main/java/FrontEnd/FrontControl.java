@@ -1,16 +1,25 @@
 package FrontEnd;
 
 import Devices.Device;
+import Devices.ROM;
 import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+import java.io.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 public class FrontControl {
 
@@ -30,7 +39,7 @@ public class FrontControl {
 
     //devicepane
     @FXML
-    private Pane devicePane;
+    private VBox devicePane;
 
     //CPU area
     //choicebox for debugger
@@ -72,6 +81,14 @@ public class FrontControl {
     @FXML
     private Label clockCycleCount;
 
+    //autoclocker
+    @FXML
+    private TextField autoClockTF;
+    @FXML
+    private Button autoClockButt;
+    private Timeline autoClockTimeline;
+    private boolean autoClockActive;
+
 
 
     @FXML
@@ -95,17 +112,173 @@ public class FrontControl {
                 }
         );
 
+        //try to default debugger to 0th device
+        try {
+            debuggerDropdown.getSelectionModel().select(0);
+        } catch (Exception ex) {
+            //if there is no devices in Bus.Devices to begin with
+        }
+
         //initialise Registers panel
         updateRegistersPanel();
+
+
+        //set up tooltip for autoClockTF
+        //Tooltip ACTFTooltip = new Tooltip("The automatic clock is only accurate to 1KHz"); //up for testing
+        Tooltip ACTFTooltip = new Tooltip("Input a Double value");
+        ACTFTooltip.setStyle("-fx-font: 12 sans-serif");
+        ACTFTooltip.setShowDelay(Duration.millis(10));
+        autoClockTF.setTooltip(ACTFTooltip);
+
+
+        //setup empty autoclock
+        autoClockTimeline = new Timeline();
+
 
     }
 
     @FXML
     protected void onROMButtonClick(){
         DeviceController dc = () -> {
-                VBox returnedPane = new VBox();
-                returnedPane.getChildren().add(new Label("ROMButton"));
-                return returnedPane;
+            AtomicReference<ROM> selectedROM = new AtomicReference<>();
+
+            ChoiceBox<ROM> ROMCB = new ChoiceBox<>();
+            ROMCB.setPrefHeight(new Text("ROM\nROM").getLayoutBounds().getHeight() + 10);
+            //initialise contents of ROMCB when ROM menu is entered
+            ROMCB.getItems().clear();
+            for (Device d: Bus.devices) {
+                if(d.getClass().getSimpleName().equals("ROM")){
+                    ROMCB.getItems().add((ROM) d);
+                }
+            }
+
+            //check for and add new ROM objects if Bus.devices changes
+            Bus.devices.addListener((ListChangeListener<Device>) change -> {
+                ROMCB.getItems().clear();
+                for (Device d: Bus.devices) {
+                    if(d.getClass().getSimpleName().equals("ROM")){
+                        ROMCB.getItems().add((ROM) d);
+                    }
+                }
+            });
+            //set the selectedROM on selection
+            ROMCB.getSelectionModel().selectedItemProperty().addListener(
+                    (observableValue, oldROM, newROM) -> {
+
+                        selectedROM.set(newROM);
+                        debuggerDropdown.getSelectionModel().select(newROM);
+                    }
+            );
+
+            TextArea BINfilepathTF = new TextArea();
+            BINfilepathTF.setPromptText("Please Enter FULL path to BIN file");
+            BINfilepathTF.setWrapText(true);
+            BINfilepathTF.setPrefRowCount(3);
+
+            Button writeROMButt = new Button("Flash ROM with BIN file");
+
+            writeROMButt.setOnAction( eh -> {
+                //get filepath text
+
+                String BINfilepath = BINfilepathTF.getText().toUpperCase();
+
+                //check if it is BIN file
+                if(!Pattern.compile("^(.*)\\b.BIN\\b$").matcher(BINfilepath).matches()){
+                    //if the file is not bin file
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Bad File!");
+                    a.setHeaderText("filepath provided does not link to a BIN file!");
+                    a.showAndWait();
+                }
+                //if the file is a BIN file, check if it exists
+                else if(!(new File(BINfilepath).exists())){
+                    //if the file does not exist
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Bad File!");
+                    a.setHeaderText("a BIN file does not exist at given filepath!");
+                    a.showAndWait();
+                }
+                //check if a ROM object is selected
+                else if(selectedROM.get() == null){
+                    //if no ROM chosen
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("no ROM chosen!");
+                    a.setHeaderText("choose a ROM device to edit from the dropdown box");
+                    a.showAndWait();
+                }
+                //if the file is BIN and it exists and a ROM object to edit is chosen
+                else {
+                    try (
+                            InputStream inputStream = new FileInputStream(BINfilepath)
+                    ) {
+                        byte[] inBytes = inputStream.readAllBytes();
+
+                        //push a warning if ROM has less space than BIN file
+                        if(selectedROM.get().getROMSize() < inBytes.length){
+                            Alert a = new Alert(Alert.AlertType.WARNING);
+                            a.setTitle("Too Much Data!");
+                            a.setHeaderText("You are writing more Bytes than the selected ROM can store!\n"
+                                            + "We will only write the first " + selectedROM.get().getROMSize() + "Bytes of your file.");
+                            a.showAndWait();
+                        }
+
+                        //flash the ROM
+                        selectedROM.get().flashROM(inBytes);
+
+                        //update debugger to view the edited ROM
+                        debuggerDropdown.getSelectionModel().select(selectedROM.get());
+                        updateDebuggerTA();
+
+                    } catch (ArithmeticException ArE){
+                        //if the file does not exist
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Bad File!");
+                        a.setHeaderText("Your file is too big! \nWe accept files up to 2147483647 Bytes in size only!");
+                        a.showAndWait();
+                    } catch (IOException ex) {
+                        //if there is an IOException
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("IOException!");
+                        a.setHeaderText("Somehow an IOException Occurred???");
+                        a.setContentText(ex.getMessage());
+                        a.showAndWait();
+                    }
+                }
+            });
+
+            Button wipeROMButt = new Button("Wipe ROM");
+
+            wipeROMButt.setOnAction(eh -> {
+                //check if a ROM object is selected
+                if(selectedROM.get() == null){
+                    //if no ROM chosen
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("no ROM chosen!");
+                    a.setHeaderText("choose a ROM device to edit from the dropdown box");
+                    a.showAndWait();
+                } else {
+                    byte[] emptyROM = new byte[selectedROM.get().getROMSize()];
+                    selectedROM.get().flashROM(emptyROM);
+                    //update debugger to view the wiped ROM
+                    debuggerDropdown.getSelectionModel().select(selectedROM.get());
+                    updateDebuggerTA();
+                }
+            });
+
+            //create the pane and add children
+            VBox returnedPane = new VBox();
+
+            returnedPane.getChildren().add(new Label("ROM Flasher"));
+
+            returnedPane.getChildren().add(ROMCB);
+            returnedPane.getChildren().add(BINfilepathTF);
+            returnedPane.getChildren().add(writeROMButt);
+            returnedPane.getChildren().add(wipeROMButt);
+
+            returnedPane.setAlignment(Pos.CENTER);
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color:  #ff860d; -fx-padding: 10;");
+
+            return returnedPane;
         };
         devicePane.getChildren().clear();
         devicePane.getChildren().add(dc.drawDetailedMenu());
@@ -145,6 +318,9 @@ public class FrontControl {
             returnedPane.getChildren().add(addressTF);
             returnedPane.getChildren().add(valueTF);
             returnedPane.getChildren().add(b);
+
+            returnedPane.setAlignment(Pos.CENTER);
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10;");
 
             return returnedPane;
         };
@@ -197,6 +373,8 @@ public class FrontControl {
     }
 
     public void updateDebuggerTA(){
+        //remember debugger scroll position
+        double scrollPosition = debuggerTA.scrollTopProperty().doubleValue();
         //debuggerTA.clear();
         StringBuilder sb = new StringBuilder();
         if(debuggerLookAt != null) {
@@ -223,6 +401,8 @@ public class FrontControl {
             } while (currAddr != (short) 0xFFFF);
         }
         debuggerTA.setText(sb.toString().replace(' ','0').replace('_',' '));
+        //restore debugger scroll position
+        debuggerTA.setScrollTop(scrollPosition);
     }
 
     protected void updateRegistersPanel(){
@@ -315,6 +495,50 @@ public class FrontControl {
     protected void debuggerShowAllButtAction(){
         this.debuggerLookAt = null;
         updateDebuggerTA();
+    }
+
+    @FXML
+    protected void autoClockButtonAction(){
+        if(autoClockActive) {
+            //interrupt the thread
+            autoClockTimeline.stop();
+            autoClockActive = false;
+            //change button colour to red
+            autoClockButt.setStyle("-fx-background-color: #cc0000; -fx-border-color:  #3465a4; " +
+                    "-fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5");
+        }
+        else{
+            try  {
+                //try to get Hz Double
+                double autoClockHzIn = Double.parseDouble(autoClockTF.getText());
+
+                //if 0Hz, do nothing (or else div by 0 error
+                if(autoClockHzIn == 0) return;
+
+                //clear old timeline of autoclock
+                autoClockTimeline.getKeyFrames().clear();
+                //set up a new timeline for the autoclock
+                autoClockTimeline.getKeyFrames().add(
+                        new KeyFrame(Duration.seconds(1/autoClockHzIn), (ActionEvent event) -> this.stepClockOnAction())
+                );
+
+                autoClockTimeline.setCycleCount(Timeline.INDEFINITE);
+                //start the thread
+                autoClockTimeline.play();
+                autoClockActive = true;
+                //change button colour to green
+                autoClockButt.setStyle("-fx-background-color: #00cc00; -fx-border-color:  #3465a4; " +
+                        "-fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5");
+            } catch (NumberFormatException nfe){
+                //if bad (non-double) value was passed into CPU Hz TextField
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Not a valid CPU Hz!");
+                a.setHeaderText("You did not enter a double for the autoclock CPU Hz parameter!");
+                a.showAndWait();
+            }
+
+
+        }
     }
 
 }
