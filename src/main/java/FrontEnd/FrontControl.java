@@ -484,6 +484,9 @@ public class FrontControl {
                 } else {
                     //disconnect if already connected
                     Bus.devices.remove(inputObject);
+                    //redraw the debug screen by defaulting to first object
+                    debuggerDropdown.getSelectionModel().select(0);
+                    updateDebuggerTA();
                 }
             });
 
