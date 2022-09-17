@@ -2,8 +2,6 @@ package Devices;
 
 public class RAM extends Device{
 
-    @SuppressWarnings("FieldMayBeFinal")
-    //idk why this warning suppression is needed because storage can be modified in passivelyRead
     private byte[] storage;
 
     public RAM(String _name, short _startAddress, short _endAddress){

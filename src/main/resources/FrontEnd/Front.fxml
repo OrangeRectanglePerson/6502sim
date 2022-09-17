@@ -12,11 +12,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FrontEnd.FrontControl">
+<AnchorPane fx:id="allPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FrontEnd.FrontControl">
    <children>
       <AnchorPane layoutX="71.0" layoutY="9.0" prefHeight="600.0" prefWidth="440.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="360.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ToolBar prefHeight="45.0" prefWidth="440.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ToolBar prefHeight="45.0" prefWidth="440.0" style="-fx-alignment: center;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
                 <Button fx:id="ROMButton" alignment="CENTER" mnemonicParsing="false" onAction="#onROMButtonClick" style="-fx-background-color: #ea7500; -fx-border-color: #ff860d; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="ROM" textAlignment="CENTER">
                      <font>

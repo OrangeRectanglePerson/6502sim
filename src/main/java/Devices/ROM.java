@@ -2,9 +2,8 @@ package Devices;
 
 public class ROM extends Device{
 
-    @SuppressWarnings("FieldMayBeFinal")
-    //idk why this warning suppression is needed because storage can be modified in passivelyRead
-    private byte[] storage;
+
+    private final byte[] storage;
 
     public ROM(String _name, short _startAddress, short _endAddress){
         this.deviceName = _name;

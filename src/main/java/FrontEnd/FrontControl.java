@@ -1,27 +1,35 @@
 package FrontEnd;
 
 import Devices.Device;
+import Devices.Input;
 import Devices.ROM;
 import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.DoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 public class FrontControl {
+
+    // the pane that encompasses all
+    @FXML
+    private AnchorPane allPane;
 
     // device buttons
     @FXML
@@ -89,6 +97,12 @@ public class FrontControl {
     private Timeline autoClockTimeline;
     private boolean autoClockActive;
 
+    // stuff for input
+    private Input inputObject;
+
+
+
+
 
 
     @FXML
@@ -133,6 +147,43 @@ public class FrontControl {
 
         //setup empty autoclock
         autoClockTimeline = new Timeline();
+
+
+        // create a new Input Object (there will only be one per computer)
+        // default start address will be 0x00_00
+
+        inputObject = new Input("Input", (short) 0x0000);
+
+        //set key handler for key press
+        allPane.setOnKeyPressed(eh -> {
+            //if keypress has not yet been registered
+            if (!inputObject.isKeyPressRegistered()){
+                //if all characters are to be detected OR
+                //if the keypress is in the allowed characters list
+                if (inputObject.getAllowedCharacters() == null
+                        || inputObject.getAllowedCharacters().contains(eh.getCode().getChar().charAt(0))){
+                    inputObject.registerKeyPress(eh.getCode());
+
+                    //if we should send a IRQ for this keypress,
+                    if(inputObject.isSendKeyPressInterrupts()){
+                        Bus.processor.IRQ();
+                    }
+                }
+                inputObject.setKeyPressRegistered(true);
+                //update the debug pane if Input item is on the bus
+                if(Bus.devices.contains(inputObject)) updateDebuggerTA();
+            }
+        });
+        allPane.setOnKeyReleased( eh -> {
+            if(!inputObject.isStickyKeys()){
+                //reset to 0x0000 using key 0x0000
+                inputObject.clearKey();
+            }
+            //open for new keypress
+            inputObject.setKeyPressRegistered(false);
+            //update the debug pane if Input item is on the bus
+            if(Bus.devices.contains(inputObject)) updateDebuggerTA();
+        });
 
 
     }
@@ -332,11 +383,170 @@ public class FrontControl {
     protected void onInputButtonClick(){
         DeviceController dc = () -> {
             VBox returnedPane = new VBox();
-            returnedPane.getChildren().add(new Label("InputButton"));
+
+            Label currentAddrL = new Label("Current Address : Ox0000 & 0x0001");
+
+            TextField addressTF = new TextField();
+            addressTF.setPromptText("short new address (hex value)");
+
+            ToolBar addrEditorButts = new ToolBar();
+
+            Button addressButt = new Button("Set New Address");
+
+            addressButt.setOnAction( eh -> {
+                short editAddr;
+                try{
+                    editAddr = (short)Integer.parseInt(addressTF.getText(),16);
+
+                    boolean isAddrTaken = false;
+
+                    for(Device d : Bus.devices){
+                        // check if proposed address is taken
+                        if((Short.toUnsignedInt(editAddr) >= d.getStartAddress()
+                                && Short.toUnsignedInt(editAddr) <= d.getEndAddress())
+                        || (Short.toUnsignedInt((short) (editAddr+1)) >= d.getStartAddress()
+                                && Short.toUnsignedInt((short) (editAddr+1)) <= d.getEndAddress())) {
+                            isAddrTaken = true; break;
+                        }
+                    }
+
+                    if(isAddrTaken){
+                        // is new address space is already taken by other devices
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Bad Value!");
+                        a.setHeaderText("Proposed Address space is already taken!");
+                        a.showAndWait();
+                    } else {
+                        // else set new address & update the Label
+                        inputObject.setStartAddress(editAddr);
+
+                        String startAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress()));
+                        String endAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getEndAddress()));
+
+                        currentAddrL.setText(String.format("Current_Address_:_0x%4s_0x%4s",startAddrString,endAddrString)
+                                .replace(' ','0').replace('_',' '));
+                    }
+
+                } catch (NumberFormatException nfe) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Bad Value!");
+                    a.setHeaderText("values given for new address is bad!");
+                    a.showAndWait();
+                }
+                updateDebuggerTA();
+            });
+
+            ToggleButton busConnectTB = new ToggleButton("Connect Input Device To Bus");
+
+            busConnectTB.setOnAction(eh -> {
+                if(busConnectTB.isSelected()){
+                    // check if current address space is taken before connecting
+
+                    boolean isAddrTaken = false;
+
+                    for(Device d : Bus.devices){
+                        // check if proposed address is taken
+                        if((Short.toUnsignedInt(inputObject.getStartAddress()) >= d.getStartAddress()
+                                && Short.toUnsignedInt(inputObject.getStartAddress()) <= d.getEndAddress())
+                                || (Short.toUnsignedInt(inputObject.getEndAddress()) >= d.getStartAddress()
+                                && Short.toUnsignedInt(inputObject.getEndAddress()) <= d.getEndAddress())) {
+                            isAddrTaken = true; break;
+                        }
+                    }
+
+                    if(isAddrTaken){
+                        // is address space is already taken by other devices
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Wait A Minute!");
+                        a.setHeaderText("The Address Space you allocated to this Input Object is unavailable!");
+                        a.showAndWait();
+                    } else {
+                        // else conncect to the bus and update the label
+                        Bus.devices.add(inputObject);
+
+                        String startAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress()));
+                        String endAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getEndAddress()));
+
+                        currentAddrL.setText(String.format("Current_Address_:_0x%4s_0x%4s",startAddrString,endAddrString)
+                                .replace(' ','0').replace('_',' '));
+                    }
+                } else {
+                    //disconnect if already connected
+                    Bus.devices.remove(inputObject);
+                }
+            });
+
+            addrEditorButts.getItems().add(addressButt);
+            addrEditorButts.getItems().add(busConnectTB);
+            addrEditorButts.setStyle("-fx-alignment: center; -fx-background-color: none;");
+
+
+            TextField detectCharsTF = new TextField();
+            detectCharsTF.setPromptText("Type in characters to detect");
+
+            ToolBar detectCharsButts= new ToolBar();
+
+            Button setCharsToDetectButt = new Button("Set Characters");
+            setCharsToDetectButt.setStyle("-fx-border-color:  blue;");
+
+            Button detectAllButt = new Button("Detect All Characters");
+
+            setCharsToDetectButt.setOnAction( eh -> {
+                inputObject.setAllowedCharacters(
+                        (detectCharsTF.getText().toLowerCase() + detectCharsTF.getText().toUpperCase()).toCharArray());
+                setCharsToDetectButt.setStyle("-fx-border-color:  blue;");
+                detectAllButt.setStyle("-fx-border-color:  none;");
+            });
+            detectAllButt.setOnAction( eh -> {
+                inputObject.allAllowedCharacters();
+                detectAllButt.setStyle("-fx-border-color:  blue;");
+                setCharsToDetectButt.setStyle("-fx-border-color:  none;");
+            });
+
+            detectCharsButts.getItems().add(setCharsToDetectButt);
+            detectCharsButts.getItems().add(detectAllButt);
+            detectCharsButts.setStyle("-fx-alignment: center; -fx-background-color: none;");
+
+
+            ToolBar otherInputSettingsButts= new ToolBar();
+
+            ToggleButton toSendIRQTB = new ToggleButton("send IRQ on keypress?");
+            toSendIRQTB.setOnAction(eh -> {
+                inputObject.setSendKeyPressInterrupts(toSendIRQTB.isSelected());
+            });
+
+            ToggleButton stickyKeysTB = new ToggleButton("StickyKeys");
+            Tooltip stickyKeysTT = new Tooltip("if selected, keycode will not get cleared when key is released.\n" +
+                    "if not selected, keycode will reset to 0x0000 on release");
+            stickyKeysTT.setStyle("-fx-font: 12 sans-serif");
+            stickyKeysTB.setTooltip(stickyKeysTT);
+            stickyKeysTB.setOnAction(eh -> {
+                inputObject.setStickyKeys(stickyKeysTB.isSelected());
+            });
+
+            otherInputSettingsButts.getItems().add(toSendIRQTB);
+            otherInputSettingsButts.getItems().add(stickyKeysTB);
+            otherInputSettingsButts.setStyle("-fx-alignment: center; -fx-background-color: none;");
+
+
+            returnedPane.getChildren().add(new Label("Input Object (you only get one)"));
+            returnedPane.getChildren().add(currentAddrL);
+            returnedPane.getChildren().add(addressTF);
+            returnedPane.getChildren().add(addrEditorButts);
+            returnedPane.getChildren().add(detectCharsTF);
+            returnedPane.getChildren().add(detectCharsButts);
+            returnedPane.getChildren().add(otherInputSettingsButts);
+
+            returnedPane.setAlignment(Pos.CENTER);
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #780373; -fx-padding: 10;");
+
             return returnedPane;
         };
+
+
         devicePane.getChildren().clear();
         devicePane.getChildren().add(dc.drawDetailedMenu());
+
     }
 
     @FXML
