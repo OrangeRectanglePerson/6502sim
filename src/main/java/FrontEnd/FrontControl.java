@@ -384,7 +384,15 @@ public class FrontControl {
         DeviceController dc = () -> {
             VBox returnedPane = new VBox();
 
-            Label currentAddrL = new Label("Current Address : Ox0000 & 0x0001");
+            Label currentAddrL = new Label();
+            {
+                String startAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress()));
+                String endAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getEndAddress()));
+
+                currentAddrL.setText(String.format("Current_Address_:_0x%4s_0x%4s",startAddrString,endAddrString)
+                        .replace(' ','0').replace('_',' '));
+            }
+
 
             TextField addressTF = new TextField();
             addressTF.setPromptText("short new address (hex value)");
@@ -438,6 +446,8 @@ public class FrontControl {
 
             ToggleButton busConnectTB = new ToggleButton("Connect Input Device To Bus");
 
+            if(Bus.devices.contains(inputObject)) busConnectTB.setSelected(true);
+
             busConnectTB.setOnAction(eh -> {
                 if(busConnectTB.isSelected()){
                     // check if current address space is taken before connecting
@@ -460,6 +470,7 @@ public class FrontControl {
                         a.setTitle("Wait A Minute!");
                         a.setHeaderText("The Address Space you allocated to this Input Object is unavailable!");
                         a.showAndWait();
+                        busConnectTB.setSelected(false);
                     } else {
                         // else conncect to the bus and update the label
                         Bus.devices.add(inputObject);
@@ -483,6 +494,13 @@ public class FrontControl {
 
             TextField detectCharsTF = new TextField();
             detectCharsTF.setPromptText("Type in characters to detect");
+            if(inputObject.getAllowedCharacters() != null){
+                char[] allowedChars = new char[inputObject.getAllowedCharacters().size()];
+                for (int i = 0; i < allowedChars.length; i++) {
+                    allowedChars[i] = inputObject.getAllowedCharacters().get(i);
+                }
+                detectCharsTF.setText(new String(allowedChars));
+            }
 
             ToolBar detectCharsButts= new ToolBar();
 
@@ -503,6 +521,11 @@ public class FrontControl {
                 setCharsToDetectButt.setStyle("-fx-border-color:  none;");
             });
 
+            if(inputObject.getAllowedCharacters() == null) {
+                detectAllButt.setStyle("-fx-border-color:  blue;");
+                setCharsToDetectButt.setStyle("-fx-border-color:  none;");
+            }
+
             detectCharsButts.getItems().add(setCharsToDetectButt);
             detectCharsButts.getItems().add(detectAllButt);
             detectCharsButts.setStyle("-fx-alignment: center; -fx-background-color: none;");
@@ -511,11 +534,13 @@ public class FrontControl {
             ToolBar otherInputSettingsButts= new ToolBar();
 
             ToggleButton toSendIRQTB = new ToggleButton("send IRQ on keypress?");
+            if(inputObject.isSendKeyPressInterrupts()) toSendIRQTB.setSelected(true);
             toSendIRQTB.setOnAction(eh -> {
                 inputObject.setSendKeyPressInterrupts(toSendIRQTB.isSelected());
             });
 
             ToggleButton stickyKeysTB = new ToggleButton("StickyKeys");
+            if(inputObject.isStickyKeys()) stickyKeysTB.setSelected(true);
             Tooltip stickyKeysTT = new Tooltip("if selected, keycode will not get cleared when key is released.\n" +
                     "if not selected, keycode will reset to 0x0000 on release");
             stickyKeysTT.setStyle("-fx-font: 12 sans-serif");

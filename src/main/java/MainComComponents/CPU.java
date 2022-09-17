@@ -1131,11 +1131,11 @@ public class CPU{
         if (getFlag(CPUFlags.D_INTERRUPT) == 0){
             //1
             //write high byte
-            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer),
                     (byte)((programCounter >>> 8) & 0xff));
             stackPointer--;
             //write low byte
-            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer),
                     (byte)(programCounter& 0xff));
             stackPointer--;
 
@@ -1143,7 +1143,7 @@ public class CPU{
             setFlag(CPUFlags.BREAK, false);
             setFlag(CPUFlags.UNUSED, true);
             setFlag(CPUFlags.D_INTERRUPT, true);
-            this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer), stat_regs);
+            this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer), stat_regs);
             stackPointer--;
 
             //3
@@ -1162,11 +1162,11 @@ public class CPU{
     public synchronized void NMI(){
         //1
         //write high byte
-        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer),
                 (byte)((programCounter >>> 8) & 0xff));
         stackPointer--;
         //write low byte
-        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer),
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer),
                 (byte)(programCounter& 0xff));
         stackPointer--;
 
@@ -1174,7 +1174,7 @@ public class CPU{
         setFlag(CPUFlags.BREAK, false);
         setFlag(CPUFlags.UNUSED, true);
         setFlag(CPUFlags.D_INTERRUPT, true);
-        this.activelyWrite(UnsignedMath.byteToShort((byte)0x10, stackPointer), stat_regs);
+        this.activelyWrite(UnsignedMath.byteToShort((byte)0x01, stackPointer), stat_regs);
         stackPointer--;
 
         //3
