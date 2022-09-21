@@ -1,8 +1,6 @@
 package FrontEnd;
 
-import Devices.Device;
-import Devices.Input;
-import Devices.ROM;
+import Devices.*;
 import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
 import javafx.animation.KeyFrame;
@@ -87,7 +85,7 @@ public class FrontControl {
     private Label SRNLabel;
 
     @FXML
-    private Label clockCycleCount;
+    private TextField clockCycleCount;
 
     //autoclocker
     @FXML
@@ -221,6 +219,7 @@ public class FrontControl {
                     }
             );
 
+
             TextArea BINfilepathTF = new TextArea();
             BINfilepathTF.setPromptText("Please Enter FULL path to BIN file");
             BINfilepathTF.setWrapText(true);
@@ -316,6 +315,8 @@ public class FrontControl {
                 }
             });
 
+
+
             //create the pane and add children
             VBox returnedPane = new VBox();
 
@@ -338,37 +339,133 @@ public class FrontControl {
     @FXML
     protected void onRAMButtonClick(){
         DeviceController dc = () -> {
-            VBox returnedPane = new VBox();
+            AtomicReference<RAM> selectedRAM = new AtomicReference<>();
 
-            TextField addressTF = new TextField();
-            addressTF.setPromptText("short address (hex value)");
+            TextArea RAMDisp = new TextArea("Select A RAM Device to view");
+            RAMDisp.setEditable(false);
+            RAMDisp.setPrefHeight((new Text("R\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\nR\n")
+                    .getLayoutBounds().getHeight() + 10)*(18.0/12.0));
+            RAMDisp.setStyle("-fx-control-inner-background: black; -fx-font-size: 18; -fx-font-family: consolas;");
+            //refresh RAMDisp when clocked
+            //we can detect if a clock has happened by detecting a change in clock count number
+            this.clockCycleCount.textProperty().addListener((obs,oldV,newV) -> {
+                //remember ramdisp scroll position
+                double scrollPosition = RAMDisp.scrollTopProperty().doubleValue();
+                StringBuilder sb = new StringBuilder();
+                if(selectedRAM.get() != null) {
+                    short currAddr = selectedRAM.get().getStartAddress();
+                    currAddr--;
+                    do {
+                        currAddr++;
+                        //if(currAddr % 1000 == 0) System.out.println(currAddr);
+                        String addrHex = Integer.toHexString(Short.toUnsignedInt(currAddr));
+                        byte memValue = Bus.serveDataFromAdr(currAddr);
+                        String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
+                        String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
+                        sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
+                    } while (currAddr != debuggerLookAt.getEndAddress());
+                } else {
+                    sb.append("Select_A_RAM_Device_to_view.");
+                }
+                RAMDisp.setText(sb.toString().replace(' ','0').replace('_',' '));
+                //restore ram disp scroll position
+                RAMDisp.setScrollTop(scrollPosition);
+            });
 
-            TextField valueTF = new TextField();
-            valueTF.setPromptText("set byte value (hex value)");
+            ChoiceBox<RAM> RAMCB = new ChoiceBox<>();
+            RAMCB.setPrefHeight(new Text("RAM\nRAM").getLayoutBounds().getHeight() + 10);
+            //initialise contents of RAMCB when RAM menu is entered
+            RAMCB.getItems().clear();
+            for (Device d: Bus.devices) {
+                if(d.getClass().getSimpleName().equals("RAM")){
+                    RAMCB.getItems().add((RAM) d);
+                }
+            }
 
-            Button b = new Button("Set Value");
+            //check for and add new RAM objects if Bus.devices changes
+            Bus.devices.addListener((ListChangeListener<Device>) change -> {
+                RAMCB.getItems().clear();
+                for (Device d: Bus.devices) {
+                    if(d.getClass().getSimpleName().equals("RAM")){
+                        RAMCB.getItems().add((RAM) d);
+                    }
+                }
+            });
+            //set the selectedROM on selection
+            RAMCB.getSelectionModel().selectedItemProperty().addListener(
+                    (observableValue, oldROM, newROM) -> {
+                        selectedRAM.set(newROM);
 
-            b.setOnAction( eh -> {
-                short editAddr;
-                byte editVal;
-                try{
-                    editAddr = (short)Integer.parseInt(addressTF.getText(),16);
-                    editVal = (byte) Integer.parseInt(valueTF.getText(),16);
+                        //update RAMDisp
+                        //remember ramdisp scroll position
+                        double scrollPosition = RAMDisp.scrollTopProperty().doubleValue();
+                        StringBuilder sb = new StringBuilder();
+                        if(selectedRAM.get() != null) {
+                            short currAddr = selectedRAM.get().getStartAddress();
+                            currAddr--;
+                            do {
+                                currAddr++;
+                                //if(currAddr % 1000 == 0) System.out.println(currAddr);
+                                String addrHex = Integer.toHexString(Short.toUnsignedInt(currAddr));
+                                byte memValue = Bus.serveDataFromAdr(currAddr);
+                                String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
+                                String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
+                                sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
+                            } while (currAddr != debuggerLookAt.getEndAddress());
+                        } else {
+                            sb.append("Select_A_RAM_Device_to_view.");
+                        }
+                        RAMDisp.setText(sb.toString().replace(' ','0').replace('_',' '));
+                        //restore ram disp scroll position
+                        RAMDisp.setScrollTop(scrollPosition);
+                    }
+            );
 
-                    Bus.serveDataToAdr(editAddr,editVal);
-                } catch (NumberFormatException nfe) {
+            Button resetButt = new Button("Reset RAM");
+
+            resetButt.setOnAction( eh -> {
+                if(selectedRAM.get() != null) {
+                    selectedRAM.get().resetRAM();
+                } else {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setTitle("Bad Value!");
-                    a.setHeaderText("values for address and edit value are bad!");
+                    a.setTitle("NO RAM DEVICE SELECTED!");
+                    a.setHeaderText("Select a RAM device to wipe.");
                     a.showAndWait();
                 }
+
+                //update RAMDisp & debugger after this
+                //remember ramdisp scroll position
+                double scrollPosition = RAMDisp.scrollTopProperty().doubleValue();
+                StringBuilder sb = new StringBuilder();
+                if(selectedRAM.get() != null) {
+                    short currAddr = selectedRAM.get().getStartAddress();
+                    currAddr--;
+                    do {
+                        currAddr++;
+                        //if(currAddr % 1000 == 0) System.out.println(currAddr);
+                        String addrHex = Integer.toHexString(Short.toUnsignedInt(currAddr));
+                        byte memValue = Bus.serveDataFromAdr(currAddr);
+                        String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
+                        String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
+                        sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
+                    } while (currAddr != debuggerLookAt.getEndAddress());
+                } else {
+                    sb.append("Select A RAM Device to view.");
+                }
+                RAMDisp.setText(sb.toString().replace(' ','0').replace('_',' '));
+                //restore ram disp scroll position
+                RAMDisp.setScrollTop(scrollPosition);
+
+                //update debugger TA
                 updateDebuggerTA();
             });
 
-            returnedPane.getChildren().add(new Label("RAM Editor"));
-            returnedPane.getChildren().add(addressTF);
-            returnedPane.getChildren().add(valueTF);
-            returnedPane.getChildren().add(b);
+            VBox returnedPane = new VBox();
+
+            returnedPane.getChildren().add(new Label("RAM Viewer"));
+            returnedPane.getChildren().add(RAMCB);
+            returnedPane.getChildren().add(RAMDisp);
+            returnedPane.getChildren().add(resetButt);
 
             returnedPane.setAlignment(Pos.CENTER);
             returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10;");
@@ -441,6 +538,7 @@ public class FrontControl {
                     a.setHeaderText("values given for new address is bad!");
                     a.showAndWait();
                 }
+                debuggerDropdown.getSelectionModel().select(inputObject);
                 updateDebuggerTA();
             });
 

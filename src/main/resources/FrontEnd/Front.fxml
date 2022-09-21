@@ -80,16 +80,16 @@
             <AnchorPane layoutX="220.0" layoutY="30.0" prefHeight="285.0" prefWidth="140.0" style="-fx-background-color: #000080;" AnchorPane.leftAnchor="220.0" AnchorPane.topAnchor="25.0">
                <children>
                   <Separator layoutY="126.0" prefHeight="45.0" prefWidth="140.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="130.0" />
-                  <Label alignment="CENTER" layoutX="42.0" layoutY="36.0" prefHeight="45.0" prefWidth="130.0" text="Clock Cycle Number:" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="10.0">
+                  <Label alignment="CENTER" layoutX="42.0" layoutY="36.0" prefHeight="45.0" prefWidth="130.0" text="Clock Cycle Number:" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                      <font>
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="clockCycleCount" alignment="CENTER" layoutX="11.0" layoutY="42.0" prefHeight="18.0" prefWidth="130.0" text="0" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="55.0">
+                  <TextField fx:id="clockCycleCount" alignment="CENTER" editable="false" prefHeight="18.0" prefWidth="130.0" text="0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="50.0">
                      <font>
-                        <Font name="Consolas" size="16.0" />
+                        <Font name="Consolas" size="14.0" />
                      </font>
-                  </Label>
+                  </TextField>
                   <Button alignment="CENTER" layoutX="44.0" layoutY="70.0" mnemonicParsing="false" onAction="#stepClockOnAction" prefHeight="55.0" prefWidth="120.0" style="-fx-background-color: #4700b8; -fx-border-color: #b3b3b3; -fx-border-width: 3; -fx-background-insets: 1; -fx-border-radius: 5;" text="Step Clock" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="80.0">
                      <font>
                         <Font name="Consolas" size="15.0" />
