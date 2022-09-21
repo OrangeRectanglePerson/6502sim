@@ -11,6 +11,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -685,8 +687,25 @@ public class FrontControl {
     @FXML
     protected void onDispButtonClick(){
         DeviceController dc = () -> {
+            ImageView iv = new ImageView();
+            iv.setFitHeight(3*128); iv.setFitWidth(3*128);
+
+            this.clockCycleCount.textProperty().addListener((obs, oldV, newV) -> {
+                for (Device d: Bus.devices) {
+                    if(d.getClass().getSimpleName().equals("Display")){
+                        iv.setImage(((Display) d).getFrame());
+                    }
+                }
+            });
+
+
             VBox returnedPane = new VBox();
-            returnedPane.getChildren().add(new Label("DispButton"));
+
+            returnedPane.getChildren().add(new Label("Display"));
+            returnedPane.getChildren().add(iv);
+
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10;");
+
             return returnedPane;
         };
         devicePane.getChildren().clear();

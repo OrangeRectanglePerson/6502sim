@@ -762,7 +762,7 @@ public class CPU{
             else if ((opcode & 0xff) == 0xAE) {
                 extraCycleA = ABS();
                 extraCycleB = LDX();
-                cycles = 42;
+                cycles = 4;
             }
 
             //high nibble 0xb
