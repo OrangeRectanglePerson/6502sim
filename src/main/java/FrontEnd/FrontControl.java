@@ -538,7 +538,13 @@ public class FrontControl {
                     a.setHeaderText("values given for new address is bad!");
                     a.showAndWait();
                 }
-                // TODO: 21/9/2022 if the current object is inputObject, refresh the choice box by plugging in and out inputObject from bus
+                //refresh the choice box menu if inputObject on the Bus
+                if(Bus.devices.contains(inputObject)) {
+                    Device currSel = debuggerLookAt;
+                    Bus.devices.remove(inputObject);
+                    Bus.devices.add(inputObject);
+                    debuggerDropdown.getSelectionModel().select(currSel);
+                }
                 updateDebuggerTA();
             });
 
