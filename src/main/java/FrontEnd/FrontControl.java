@@ -538,7 +538,7 @@ public class FrontControl {
                     a.setHeaderText("values given for new address is bad!");
                     a.showAndWait();
                 }
-                debuggerDropdown.getSelectionModel().select(inputObject);
+                // TODO: 21/9/2022 if the current object is inputObject, refresh the choice box by plugging in and out inputObject from bus
                 updateDebuggerTA();
             });
 
@@ -582,8 +582,9 @@ public class FrontControl {
                 } else {
                     //disconnect if already connected
                     Bus.devices.remove(inputObject);
-                    //redraw the debug screen by defaulting to first object
-                    debuggerDropdown.getSelectionModel().select(0);
+                    //redraw the debug screen after defaulting to first object if the current object is inputObject
+                    if(debuggerLookAt == inputObject)
+                        debuggerDropdown.getSelectionModel().select(0);
                     updateDebuggerTA();
                 }
             });
