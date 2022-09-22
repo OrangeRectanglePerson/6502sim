@@ -644,9 +644,7 @@ public class FrontControl {
 
             ToggleButton toSendIRQTB = new ToggleButton("send IRQ on keypress?");
             if(inputObject.isSendKeyPressInterrupts()) toSendIRQTB.setSelected(true);
-            toSendIRQTB.setOnAction(eh -> {
-                inputObject.setSendKeyPressInterrupts(toSendIRQTB.isSelected());
-            });
+            toSendIRQTB.setOnAction(eh -> inputObject.setSendKeyPressInterrupts(toSendIRQTB.isSelected()));
 
             ToggleButton stickyKeysTB = new ToggleButton("StickyKeys");
             if(inputObject.isStickyKeys()) stickyKeysTB.setSelected(true);
@@ -654,9 +652,7 @@ public class FrontControl {
                     "if not selected, keycode will reset to 0x0000 on release");
             stickyKeysTT.setStyle("-fx-font: 12 sans-serif");
             stickyKeysTB.setTooltip(stickyKeysTT);
-            stickyKeysTB.setOnAction(eh -> {
-                inputObject.setStickyKeys(stickyKeysTB.isSelected());
-            });
+            stickyKeysTB.setOnAction(eh -> inputObject.setStickyKeys(stickyKeysTB.isSelected()));
 
             otherInputSettingsButts.getItems().add(toSendIRQTB);
             otherInputSettingsButts.getItems().add(stickyKeysTB);
@@ -861,14 +857,13 @@ public class FrontControl {
     }
 
     protected void updateRegistersPanel(){
-        byte a, x, y, sp, sr;
+        byte a, x, y, sp;
         short pc;
 
         a = Bus.processor.getAccumulator();
         x = Bus.processor.getXReg();
         y = Bus.processor.getYReg();
         sp = Bus.processor.getStackPointer();
-        sr = Bus.processor.getStatRegs();
         pc = Bus.processor.getProgramCounter();
 
         //get hex and bin strings
