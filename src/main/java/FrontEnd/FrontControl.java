@@ -5,7 +5,6 @@ import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,14 +13,14 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
@@ -687,22 +686,116 @@ public class FrontControl {
     @FXML
     protected void onDispButtonClick(){
         DeviceController dc = () -> {
+            AtomicReference<Display> selectedDisplay = new AtomicReference<>();
+            //boolean variable to let modeCB know whether to change mode
+            AtomicBoolean justSwitchedDisplay = new AtomicBoolean(false);
+
             ImageView iv = new ImageView();
             iv.setFitHeight(3*128); iv.setFitWidth(3*128);
+            //select image
+            iv.setImage(
+                    new Image(Objects.requireNonNull(FrontControl.class
+                            .getResourceAsStream("/FrontEnd/select display to view.png"))));
 
-            this.clockCycleCount.textProperty().addListener((obs, oldV, newV) -> {
+            ChoiceBox<Display> DisplayCB = new ChoiceBox<>();
+            DisplayCB.setPrefHeight(new Text("DIS\nDIS").getLayoutBounds().getHeight() + 10);
+
+            //define the mode choicebox now to make things easy
+            ChoiceBox<String> modeCB = new ChoiceBox<>();
+            modeCB.setDisable(true);
+            modeCB.getItems().addAll(
+                    "64x64 1 bit BW",
+                    "64x64 6 bit RGB",
+                    "128x128 1 bit BW",
+                    "128x128 6 bit RGB");
+
+            //initialise contents of DisplayCB when Display menu is entered
+            DisplayCB.getItems().clear();
+            for (Device d: Bus.devices) {
+                if(d.getClass().getSimpleName().equals("Display")){
+                    DisplayCB.getItems().add((Display) d);
+                }
+            }
+
+            //check for and add new Display objects if Bus.devices changes
+            Bus.devices.addListener((ListChangeListener<Device>) change -> {
+                DisplayCB.getItems().clear();
                 for (Device d: Bus.devices) {
                     if(d.getClass().getSimpleName().equals("Display")){
-                        iv.setImage(((Display) d).getFrame());
+                        DisplayCB.getItems().add((Display) d);
                     }
                 }
+            });
+            //set the selectedDisplay on selection
+            //also enable mode selector
+            DisplayCB.getSelectionModel().selectedItemProperty().addListener(
+                    (observableValue, oldDisp, newDisp) -> {
+                        selectedDisplay.set(newDisp);
+                        iv.setImage(selectedDisplay.get().getFrame());
+                        modeCB.setDisable(false);
+                        justSwitchedDisplay.set(true);
+                        if (selectedDisplay.get().getVRAMSize() == 512) modeCB.getSelectionModel().select(0);
+                        if (selectedDisplay.get().getVRAMSize() == 4096) modeCB.getSelectionModel().select(1);
+                        if (selectedDisplay.get().getVRAMSize() == 2048) modeCB.getSelectionModel().select(2);
+                        if (selectedDisplay.get().getVRAMSize() == 16348) modeCB.getSelectionModel().select(3);
+                        justSwitchedDisplay.set(false);
+                    }
+            );
+
+
+            //"64x64 BW",         [512 bytes]
+            //"64x64 6 bit RGB",  [4096  bytes]
+            //"128x128 6 bit BW", [2048  bytes]
+            //"128x128 6 bit RGB" [16384 bytes]
+            //set display mode & refresh display
+            modeCB.getSelectionModel().selectedItemProperty().addListener(
+                    (observableValue, oldMode, newMode) -> {
+                        // TODO: 22/9/2022 address space overflow detection
+                        if(!justSwitchedDisplay.get()) {
+                            //only set mode if change is NOT due to initialisation
+                            if (modeCB.getSelectionModel().getSelectedIndex() == 0)
+                                selectedDisplay.get().setMode64BW();
+                            else if (modeCB.getSelectionModel().getSelectedIndex() == 1)
+                                selectedDisplay.get().setMode64RGB();
+                            else if (modeCB.getSelectionModel().getSelectedIndex() == 2)
+                                selectedDisplay.get().setMode128BW();
+                            else if (modeCB.getSelectionModel().getSelectedIndex() == 3)
+                                selectedDisplay.get().setMode128RGB();
+                        }
+
+                        iv.setImage(selectedDisplay.get().getFrame());
+                    }
+            );
+
+
+
+            this.clockCycleCount.textProperty().addListener((obs, oldV, newV) -> {
+                if(selectedDisplay.get() != null) iv.setImage(selectedDisplay.get().getFrame());
+                else iv.setImage(
+                        new Image(Objects.requireNonNull(FrontControl.class
+                                .getResourceAsStream("/FrontEnd/select display to view.png"))));
+            });
+
+
+            Button resetDispButt = new Button("Reset VRAM");
+            resetDispButt.setOnAction(eh -> {
+                if(selectedDisplay.get() != null) {
+                    selectedDisplay.get().clearDisp();
+                    iv.setImage(selectedDisplay.get().getFrame());
+                }
+                else iv.setImage(
+                        new Image(Objects.requireNonNull(FrontControl.class
+                                .getResourceAsStream("/FrontEnd/select display to view.png"))));
             });
 
 
             VBox returnedPane = new VBox();
 
             returnedPane.getChildren().add(new Label("Display"));
+            returnedPane.getChildren().add(DisplayCB);
+            returnedPane.getChildren().add(modeCB);
             returnedPane.getChildren().add(iv);
+            returnedPane.getChildren().add(resetDispButt);
 
             returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10;");
 
