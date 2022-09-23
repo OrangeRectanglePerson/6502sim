@@ -35,8 +35,12 @@ public class SplashScreen {
         iv.setX(0);
         iv.setY(0);
 
-        splashPT.getChildren().add(new PauseTransition(Duration.seconds(5)));
-        splashPT.setCycleCount(1);
+        FadeTransition imagFT = new FadeTransition(Duration.seconds(5),iv);
+        imagFT.setFromValue(1.0f);
+        imagFT.setToValue(0.0f);
+        imagFT.setCycleCount(1);
+
+        splashPT.getChildren().add(imagFT);
 
         pane.getChildren().addAll(iv);
 
