@@ -1,17 +1,20 @@
 package FrontEnd;
 
-import Devices.Device;
-import Devices.Display;
-import Devices.RAM;
-import Devices.ROM;
+import Devices.*;
 import MainComComponents.Bus;
 import MainComComponents.CPU;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+
+import static FrontEnd.SplashScreen.splash;
 
 public class FrontApp extends Application {
     @Override
@@ -44,12 +47,31 @@ public class FrontApp extends Application {
     }
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setResizable(true);
-        stage.setTitle("6502 microprocessor microcomputer Va.4");
-        stage.setScene(scene);
-        stage.setResizable(false);
+        SplashScreen ss = new SplashScreen();
+        ss.show();
+        stage.setScene(ss.getSplashScene());
+        ss.getTimeline().setOnFinished(e -> {
+            Timeline fadeoutTimeline = new Timeline();
+            fadeoutTimeline.getKeyFrames().add(
+                    new KeyFrame(Duration.millis(500),
+                            new KeyValue(ss.getSplashScene().getRoot().opacityProperty(), 0))
+            );
+            fadeoutTimeline.setOnFinished((event) -> {
+                try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
+                    Scene scene = new Scene(fxmlLoader.load());
+                    stage.setResizable(true);
+                    stage.setTitle("6502 microprocessor microcomputer Va.4");
+                    stage.setScene(scene);
+                    stage.setResizable(false);
+                }
+                catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            fadeoutTimeline.play();
+        });
+
         stage.show();
     }
 
