@@ -35,7 +35,7 @@ public class FrontApp extends Application {
         Bus.devices.add(new ROM("ROM", (short) 0x1000, (short) 0x4FFF));
 
         //display
-        Bus.devices.add(new Display("Display",(short) 0xB000));
+        Bus.devices.add(new Display("Display",(short) 0xF000));
 
         //0xFFFB+ header
         Bus.devices.add(new ROM("Header ROM", (short) 0xFFFA, (short) 0xFFFF));
@@ -50,6 +50,7 @@ public class FrontApp extends Application {
         SplashScreen ss = new SplashScreen();
         ss.show();
         stage.setScene(ss.getSplashScene());
+        stage.setTitle("Starting Up");
         ss.getTimeline().setOnFinished(e -> {
             Timeline fadeoutTimeline = new Timeline();
             fadeoutTimeline.getKeyFrames().add(

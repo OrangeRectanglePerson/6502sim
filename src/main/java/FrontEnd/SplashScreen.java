@@ -9,6 +9,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.util.Objects;
@@ -40,23 +42,34 @@ public class SplashScreen {
         frontImage.setY(0);
 
         VBox behindBox = new VBox();
-        behindBox.setStyle("-fx-background-color: WHITE");
-        behindBox.setPrefHeight(400);
+        
+        Label backgroundLabelTop = new Label("Welcome To");
+        backgroundLabelTop.setPrefWidth(600);
+        backgroundLabelTop.setAlignment(Pos.CENTER);
+        backgroundLabelTop.setTextAlignment(TextAlignment.CENTER);
+        backgroundLabelTop.setStyle("-fx-font-family: Monospaced; -fx-font-size: 32;");
 
-        ImageView bottomImage = new ImageView(
+        ImageView backgroundImage = new ImageView(
                 new Image(Objects.requireNonNull(SplashScreen.class
                         .getResourceAsStream("/FrontEnd/MOS_6502.jpg")))
         );
-        bottomImage.setFitWidth(600);
-        bottomImage.setFitHeight(300);
-        bottomImage.setX(0);
-        bottomImage.setY(0);
+        backgroundImage.setFitWidth(600);
+        backgroundImage.setFitHeight(300);
+        backgroundImage.setX(0);
+        backgroundImage.setY(0);
 
-        Label bottomLabel = new Label("Welcome");
-        bottomLabel.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 70;");
+        Label backgroundLabelBottom = new Label("The Virtual MOS 6502 Microcomputer");
+        backgroundLabelBottom.setPrefWidth(600);
+        backgroundLabelBottom.setAlignment(Pos.CENTER);
+        backgroundLabelBottom.setTextAlignment(TextAlignment.CENTER);
+        backgroundLabelBottom.setStyle("-fx-font-family: Monospaced; -fx-font-size: 28");
 
-        behindBox.getChildren().addAll(bottomImage, bottomLabel);
-        behindBox.setAlignment(Pos.TOP_CENTER);
+
+        behindBox.getChildren().addAll(backgroundLabelTop, backgroundImage, backgroundLabelBottom);
+        behindBox.setAlignment(Pos.CENTER);
+        behindBox.setStyle("-fx-background-color: WHITE");
+        behindBox.setPrefHeight(400);
+
 
         FadeTransition imagFT = new FadeTransition(Duration.seconds(2),frontImage);
         imagFT.setFromValue(1.0f);
@@ -65,7 +78,7 @@ public class SplashScreen {
 
         SequentialTransition imagST = new SequentialTransition();
         imagST.getChildren().addAll(
-                new PauseTransition(Duration.seconds(3)),
+                new PauseTransition(Duration.seconds(5)),
                 imagFT,
                 new PauseTransition(Duration.seconds(3))
         );
@@ -82,6 +95,11 @@ public class SplashScreen {
 
         splashPT.setCycleCount(1);
         splashPT.play();
+
+        pane.setOnMousePressed(eh -> {
+            // skip cutscene on mousepress
+            splashPT.jumpTo("end");
+        });
     }
 
     public Scene getSplashScene()

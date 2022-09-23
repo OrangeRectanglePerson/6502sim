@@ -16,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -51,7 +52,7 @@ public class FrontControl {
     //CPU area
     //choicebox for debugger
     @FXML
-    private ChoiceBox<Device> debuggerDropdown;
+    private ComboBox<Device> debuggerDropdown;
     @FXML
     private Button debuggerShowAllButt;
 
@@ -214,7 +215,6 @@ public class FrontControl {
             //set the selectedROM on selection
             ROMCB.getSelectionModel().selectedItemProperty().addListener(
                     (observableValue, oldROM, newROM) -> {
-
                         selectedROM.set(newROM);
                         debuggerDropdown.getSelectionModel().select(newROM);
                     }
@@ -321,15 +321,15 @@ public class FrontControl {
             //create the pane and add children
             VBox returnedPane = new VBox();
 
-            returnedPane.getChildren().add(new Label("ROM Flasher"));
-
+            Label menuLabel = new Label("ROM Flasher");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
             returnedPane.getChildren().add(ROMCB);
             returnedPane.getChildren().add(BINfilepathTF);
             returnedPane.getChildren().add(writeROMButt);
             returnedPane.getChildren().add(wipeROMButt);
 
-            returnedPane.setAlignment(Pos.CENTER);
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color:  #ff860d; -fx-padding: 10;");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color:  #ff860d; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
 
             return returnedPane;
         };
@@ -463,13 +463,14 @@ public class FrontControl {
 
             VBox returnedPane = new VBox();
 
-            returnedPane.getChildren().add(new Label("RAM Viewer"));
+            Label menuLabel = new Label("RAM Viewer");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
             returnedPane.getChildren().add(RAMCB);
             returnedPane.getChildren().add(RAMDisp);
             returnedPane.getChildren().add(resetButt);
 
-            returnedPane.setAlignment(Pos.CENTER);
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10;");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
 
             return returnedPane;
         };
@@ -483,6 +484,7 @@ public class FrontControl {
             VBox returnedPane = new VBox();
 
             Label currentAddrL = new Label();
+            currentAddrL.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 16; -fx-text-background-color: white");
             {
                 String startAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress()));
                 String endAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getEndAddress()));
@@ -508,10 +510,9 @@ public class FrontControl {
 
                     for(Device d : Bus.devices){
                         // check if proposed address is taken
-                        if((Short.toUnsignedInt(editAddr) >= d.getStartAddress()
-                                && Short.toUnsignedInt(editAddr) <= d.getEndAddress())
-                        || (Short.toUnsignedInt((short) (editAddr+1)) >= d.getStartAddress()
-                                && Short.toUnsignedInt((short) (editAddr+1)) <= d.getEndAddress())) {
+                        if(d != inputObject
+                                && (d.getStartAddress() >= inputObject.getStartAddress()
+                                && d.getStartAddress() <= inputObject.getStartAddress() + 1)) {
                             isAddrTaken = true; break;
                         }
                     }
@@ -614,24 +615,25 @@ public class FrontControl {
             ToolBar detectCharsButts= new ToolBar();
 
             Button setCharsToDetectButt = new Button("Set Characters");
-            setCharsToDetectButt.setStyle("-fx-border-color:  blue;");
+            setCharsToDetectButt.setStyle("-fx-border-width: 2; -fx-border-color: DeepSkyBlue; -fx-background-insets: 1");
 
             Button detectAllButt = new Button("Detect All Characters");
+            detectAllButt.setStyle("-fx-border-width: 2; -fx-border-color: none; -fx-background-insets: 1");
 
             setCharsToDetectButt.setOnAction( eh -> {
                 inputObject.setAllowedCharacters(
                         (detectCharsTF.getText().toLowerCase() + detectCharsTF.getText().toUpperCase()).toCharArray());
-                setCharsToDetectButt.setStyle("-fx-border-color:  blue;");
+                setCharsToDetectButt.setStyle("-fx-border-color: DeepSkyBlue; -fx-border-width: 2");
                 detectAllButt.setStyle("-fx-border-color:  none;");
             });
             detectAllButt.setOnAction( eh -> {
                 inputObject.allAllowedCharacters();
-                detectAllButt.setStyle("-fx-border-color:  blue;");
+                detectAllButt.setStyle("-fx-border-color: DeepSkyBlue; -fx-border-width: 2");
                 setCharsToDetectButt.setStyle("-fx-border-color:  none;");
             });
 
             if(inputObject.getAllowedCharacters() == null) {
-                detectAllButt.setStyle("-fx-border-color:  blue;");
+                detectAllButt.setStyle("-fx-border-color: DeepSkyBlue; -fx-border-width: 2");
                 setCharsToDetectButt.setStyle("-fx-border-color:  none;");
             }
 
@@ -659,7 +661,10 @@ public class FrontControl {
             otherInputSettingsButts.setStyle("-fx-alignment: center; -fx-background-color: none;");
 
 
-            returnedPane.getChildren().add(new Label("Input Object (you only get one)"));
+
+            Label menuLabel = new Label("Input Device (Only One!)");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
             returnedPane.getChildren().add(currentAddrL);
             returnedPane.getChildren().add(addressTF);
             returnedPane.getChildren().add(addrEditorButts);
@@ -667,8 +672,7 @@ public class FrontControl {
             returnedPane.getChildren().add(detectCharsButts);
             returnedPane.getChildren().add(otherInputSettingsButts);
 
-            returnedPane.setAlignment(Pos.CENTER);
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #780373; -fx-padding: 10;");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #780373; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
 
             return returnedPane;
         };
@@ -739,30 +743,172 @@ public class FrontControl {
             );
 
 
-            //"64x64 BW",         [512 bytes]
-            //"64x64 6 bit RGB",  [4096  bytes]
-            //"128x128 6 bit BW", [2048  bytes]
-            //"128x128 6 bit RGB" [16384 bytes]
+            //0 "64x64 BW",         [512 bytes]
+            //1 "64x64 6 bit RGB",  [4096  bytes]
+            //2 "128x128 6 bit BW", [2048  bytes]
+            //3 "128x128 6 bit RGB" [16384 bytes]
             //set display mode & refresh display
             modeCB.getSelectionModel().selectedItemProperty().addListener(
                     (observableValue, oldMode, newMode) -> {
-                        // TODO: 22/9/2022 address space overflow detection
                         if(!justSwitchedDisplay.get()) {
                             //only set mode if change is NOT due to initialisation
-                            if (modeCB.getSelectionModel().getSelectedIndex() == 0)
-                                selectedDisplay.get().setMode64BW();
-                            else if (modeCB.getSelectionModel().getSelectedIndex() == 1)
-                                selectedDisplay.get().setMode64RGB();
-                            else if (modeCB.getSelectionModel().getSelectedIndex() == 2)
-                                selectedDisplay.get().setMode128BW();
-                            else if (modeCB.getSelectionModel().getSelectedIndex() == 3)
-                                selectedDisplay.get().setMode128RGB();
-                        }
+                            if (modeCB.getSelectionModel().getSelectedIndex() == 0) {
+                                if (Short.toUnsignedInt(selectedDisplay.get().getStartAddress()) > (65535 - 511)) {
+                                    //check if changing mode will go out of bounds
+                                    Alert a = new Alert(Alert.AlertType.ERROR);
+                                    a.setTitle("Wait A Minute!");
+                                    a.setHeaderText("Not sufficient Address Spaces left to change to this mode!");
+                                    a.showAndWait();
+                                    justSwitchedDisplay.set(true);
+                                    modeCB.getSelectionModel().select(oldMode);
+                                    justSwitchedDisplay.set(false);
+                                } else {
+                                    //check if changing mode intrudes into other's space
+                                    boolean isAddrTaken = false;
 
+                                    for (Device d : Bus.devices) {
+                                        // check if proposed address is taken
+                                        if (d != selectedDisplay.get()
+                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
+                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 511)) {
+                                            isAddrTaken = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (isAddrTaken) {
+                                        Alert a = new Alert(Alert.AlertType.ERROR);
+                                        a.setTitle("Wait A Minute!");
+                                        a.setHeaderText("Changing to this mode will make the display address space intrude into other devices' address space");
+                                        a.showAndWait();
+                                        justSwitchedDisplay.set(true);
+                                        modeCB.getSelectionModel().select(oldMode);
+                                        justSwitchedDisplay.set(false);
+                                    } else {
+                                        selectedDisplay.get().setMode64BW();
+                                        updateDebuggerTA();
+                                        DispButton.fire();
+                                    }
+                                }
+                            } else if (modeCB.getSelectionModel().getSelectedIndex() == 1) {
+                                if (Short.toUnsignedInt(selectedDisplay.get().getStartAddress()) > (65535 - 4095)) {
+                                    //check if changing mode will go out of bounds
+                                    Alert a = new Alert(Alert.AlertType.ERROR);
+                                    a.setTitle("Wait A Minute!");
+                                    a.setHeaderText("Not sufficient Address Spaces left to change to this mode!");
+                                    a.showAndWait();
+                                    justSwitchedDisplay.set(true);
+                                    modeCB.getSelectionModel().select(oldMode);
+                                    justSwitchedDisplay.set(false);
+                                } else {
+                                    //check if changing mode intrudes into other's space
+                                    boolean isAddrTaken = false;
+
+                                    for (Device d : Bus.devices) {
+                                        // check if proposed address is taken
+                                        if (d != selectedDisplay.get()
+                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
+                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 4095)) {
+                                            isAddrTaken = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (isAddrTaken) {
+                                        Alert a = new Alert(Alert.AlertType.ERROR);
+                                        a.setTitle("Wait A Minute!");
+                                        a.setHeaderText("Changing to this mode will make the display address space intrude into other devices' address space");
+                                        a.showAndWait();
+                                        justSwitchedDisplay.set(true);
+                                        modeCB.getSelectionModel().select(oldMode);
+                                        justSwitchedDisplay.set(false);
+                                    } else {
+                                        selectedDisplay.get().setMode64RGB();
+                                        updateDebuggerTA();
+                                        DispButton.fire();
+                                    }
+                                }
+                            }else if (modeCB.getSelectionModel().getSelectedIndex() == 2) {
+                                if (Short.toUnsignedInt(selectedDisplay.get().getStartAddress()) > (65535 - 2047)) {
+                                    //check if changing mode will go out of bounds
+                                    Alert a = new Alert(Alert.AlertType.ERROR);
+                                    a.setTitle("Wait A Minute!");
+                                    a.setHeaderText("Not sufficient Address Spaces left to change to this mode!");
+                                    a.showAndWait();
+                                    justSwitchedDisplay.set(true);
+                                    modeCB.getSelectionModel().select(oldMode);
+                                    justSwitchedDisplay.set(false);
+                                } else {
+                                    //check if changing mode intrudes into other's space
+                                    boolean isAddrTaken = false;
+
+                                    for (Device d : Bus.devices) {
+                                        // check if proposed address is taken
+                                        if (d != selectedDisplay.get()
+                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
+                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 2047)) {
+                                            isAddrTaken = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (isAddrTaken) {
+                                        Alert a = new Alert(Alert.AlertType.ERROR);
+                                        a.setTitle("Wait A Minute!");
+                                        a.setHeaderText("Changing to this mode will make the display address space intrude into other devices' address space");
+                                        a.showAndWait();
+                                        justSwitchedDisplay.set(true);
+                                        modeCB.getSelectionModel().select(oldMode);
+                                        justSwitchedDisplay.set(false);
+                                    } else {
+                                        selectedDisplay.get().setMode128BW();
+                                        updateDebuggerTA();
+                                        DispButton.fire();
+                                    }
+                                }
+                            } else if (modeCB.getSelectionModel().getSelectedIndex() == 3) {
+                                if (Short.toUnsignedInt(selectedDisplay.get().getStartAddress()) > (65535 - 16383)) {
+                                    //check if changing mode will go out of bounds
+                                    Alert a = new Alert(Alert.AlertType.ERROR);
+                                    a.setTitle("Wait A Minute!");
+                                    a.setHeaderText("Not sufficient Address Spaces left to change to this mode!");
+                                    a.showAndWait();
+                                    justSwitchedDisplay.set(true);
+                                    modeCB.getSelectionModel().select(oldMode);
+                                    justSwitchedDisplay.set(false);
+                                } else {
+                                    //check if changing mode intrudes into other's space
+                                    boolean isAddrTaken = false;
+
+                                    for (Device d : Bus.devices) {
+                                        // check if proposed address is taken
+                                        if (d != selectedDisplay.get()
+                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
+                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 16383)) {
+                                            isAddrTaken = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (isAddrTaken) {
+                                        Alert a = new Alert(Alert.AlertType.ERROR);
+                                        a.setTitle("Wait A Minute!");
+                                        a.setHeaderText("Changing to this mode will make the display address space intrude into other devices' address space");
+                                        a.showAndWait();
+                                        justSwitchedDisplay.set(true);
+                                        modeCB.getSelectionModel().select(oldMode);
+                                        justSwitchedDisplay.set(false);
+                                    } else {
+                                        selectedDisplay.get().setMode128RGB();
+                                        updateDebuggerTA();
+                                        DispButton.fire();
+                                    }
+                                }
+                            }
+                        }
                         iv.setImage(selectedDisplay.get().getFrame());
                     }
             );
-
 
 
             this.clockCycleCount.textProperty().addListener((obs, oldV, newV) -> {
@@ -787,13 +933,15 @@ public class FrontControl {
 
             VBox returnedPane = new VBox();
 
-            returnedPane.getChildren().add(new Label("Display"));
+            Label menuLabel = new Label("Display");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
             returnedPane.getChildren().add(DisplayCB);
             returnedPane.getChildren().add(modeCB);
             returnedPane.getChildren().add(iv);
             returnedPane.getChildren().add(resetDispButt);
 
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10;");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
 
             return returnedPane;
         };
@@ -944,6 +1092,7 @@ public class FrontControl {
     @FXML
     protected void debuggerShowAllButtAction(){
         this.debuggerLookAt = null;
+        debuggerDropdown.getSelectionModel().clearSelection();
         updateDebuggerTA();
     }
 
@@ -990,5 +1139,7 @@ public class FrontControl {
 
         }
     }
+
+
 
 }

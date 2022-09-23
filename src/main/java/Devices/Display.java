@@ -127,16 +127,20 @@ public class Display extends Device{
     //64x64 display size [4096 pixels]
     public void setMode64BW(){
         currVRAM = new byte[512];  //each bit is 1 pixel
+        this.setEndAddress((short) (this.startAddress + (short) currVRAM.length - 1));
     }
     public void setMode64RGB(){
         currVRAM = new byte[4096]; //0xXXBB_GGRR
+        this.setEndAddress((short) (this.startAddress + (short) currVRAM.length - 1));
     }
     //128x128 display size [16384 pixels]
     public void setMode128BW(){
         currVRAM = new byte[2048]; //each bit is 1 pixel
+        this.setEndAddress((short) (this.startAddress + (short) currVRAM.length - 1));
     }
     public void setMode128RGB(){
         currVRAM = new byte[16384]; //0xXXBB_GGRR
+        this.setEndAddress((short) (this.startAddress + (short) currVRAM.length - 1));
     }
 
     public int getVRAMSize(){
