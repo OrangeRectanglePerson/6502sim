@@ -513,8 +513,8 @@ public class FrontControl {
                     for(Device d : Bus.devices){
                         // check if proposed address is taken
                         if(d != inputObject
-                                && (d.getStartAddress() >= inputObject.getStartAddress()
-                                && d.getStartAddress() <= inputObject.getStartAddress() + 1)) {
+                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(editAddr)
+                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(editAddr+1)))) {
                             isAddrTaken = true; break;
                         }
                     }
@@ -772,8 +772,8 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
-                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
-                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 511)) {
+                                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
+                                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 511)))) {
                                             isAddrTaken = true;
                                             break;
                                         }
@@ -810,8 +810,8 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
-                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
-                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 4095)) {
+                                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
+                                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 4095)))) {
                                             isAddrTaken = true;
                                             break;
                                         }
@@ -848,8 +848,8 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
-                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
-                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 2047)) {
+                                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
+                                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 2047)))) {
                                             isAddrTaken = true;
                                             break;
                                         }
@@ -886,8 +886,8 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
-                                                && (d.getStartAddress() >= selectedDisplay.get().getStartAddress()
-                                                && d.getStartAddress() <= selectedDisplay.get().getStartAddress() + 16383)) {
+                                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
+                                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 16383)))) {
                                             isAddrTaken = true;
                                             break;
                                         }
