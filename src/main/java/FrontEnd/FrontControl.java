@@ -371,7 +371,7 @@ public class FrontControl {
                         String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
                         String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
                         sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
-                    } while (currAddr != debuggerLookAt.getEndAddress());
+                    } while (currAddr !=  selectedRAM.get().getEndAddress());
                 } else {
                     sb.append("Select_A_RAM_Device_to_view.");
                 }
@@ -419,7 +419,7 @@ public class FrontControl {
                                 String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
                                 String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
                                 sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
-                            } while (currAddr != debuggerLookAt.getEndAddress());
+                            } while (currAddr != selectedRAM.get().getEndAddress());
                         } else {
                             sb.append("Select_A_RAM_Device_to_view.");
                         }
@@ -456,7 +456,7 @@ public class FrontControl {
                         String hexString = Integer.toHexString(Byte.toUnsignedInt(memValue));
                         String binString = Integer.toBinaryString(Byte.toUnsignedInt(memValue));
                         sb.append(String.format("0x%4s:_0x%2s_0b%8s%n", addrHex, hexString, binString));
-                    } while (currAddr != debuggerLookAt.getEndAddress());
+                    } while (currAddr != selectedRAM.get().getEndAddress());
                 } else {
                     sb.append("Select A RAM Device to view.");
                 }
