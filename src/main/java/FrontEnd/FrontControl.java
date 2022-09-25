@@ -329,7 +329,8 @@ public class FrontControl {
             returnedPane.getChildren().add(writeROMButt);
             returnedPane.getChildren().add(wipeROMButt);
 
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color:  #ff860d; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color:  #ff860d; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
 
             return returnedPane;
         };
@@ -470,7 +471,8 @@ public class FrontControl {
             returnedPane.getChildren().add(RAMDisp);
             returnedPane.getChildren().add(resetButt);
 
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #ff5429; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
 
             return returnedPane;
         };
@@ -672,7 +674,8 @@ public class FrontControl {
             returnedPane.getChildren().add(detectCharsButts);
             returnedPane.getChildren().add(otherInputSettingsButts);
 
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #780373; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #780373; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
 
             return returnedPane;
         };
@@ -941,7 +944,8 @@ public class FrontControl {
             returnedPane.getChildren().add(iv);
             returnedPane.getChildren().add(resetDispButt);
 
-            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10; -fx-alignment: center; -fx-spacing: 5");
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #3465a4; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
 
             return returnedPane;
         };
@@ -953,7 +957,14 @@ public class FrontControl {
     protected void onSoundButtonClick(){
         DeviceController dc = () -> {
             VBox returnedPane = new VBox();
-            returnedPane.getChildren().add(new Label("SoundButton"));
+
+            Label menuLabel = new Label("Sound (hopefully coming)");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
+
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #069a2e; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
+
             return returnedPane;
         };
         devicePane.getChildren().clear();
@@ -964,6 +975,14 @@ public class FrontControl {
     protected void onAllButtonClick(){
         DeviceController dc = () -> {
             VBox returnedPane = new VBox();
+
+            Label menuLabel = new Label("A More Customisable App Coming Soon!");
+            menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
+            returnedPane.getChildren().add(menuLabel);
+
+            returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #999999; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
+            returnedPane.setPrefHeight(devicePane.getHeight());
+
             returnedPane.getChildren().add(new Label("AllButton"));
             return returnedPane;
         };

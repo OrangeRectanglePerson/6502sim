@@ -1,0 +1,87 @@
+.button{
+    -fx-border-width: 3;
+    -fx-background-insets: 1;
+    -fx-border-radius: 5;
+}
+
+#autoClockButt{
+    -fx-border-color:  #3465a4;
+    -fx-background-color: #cc0000;
+}
+#autoClockButt:hover{
+    -fx-border-color:  skyblue;
+}
+
+#ResetButt{
+    -fx-border-color: black;
+    -fx-background-color: #ffff00;
+}
+#ResetButt:hover{
+    -fx-border-color: white;
+}
+
+#StepClockButt{
+    -fx-border-color: #b3b3b3;
+    -fx-background-color: #470b8c;
+}
+#StepClockButt:hover{
+    -fx-border-color: #eeeeee;
+}
+
+#ROMButton{
+    -fx-border-color:  #ff860d;
+    -fx-background-color:  #ea7500;
+}
+#ROMButton:hover{
+    -fx-border-color: darkorange;
+    -fx-background-color: orange;
+}
+
+#RAMButton{
+    -fx-border-color:  #ff5429;
+    -fx-background-color:  #d84315;
+}
+#RAMButton:hover{
+    -fx-border-color: red;
+    -fx-background-color: firebrick;
+}
+
+#InputButton{
+    -fx-border-color: #780373;
+    -fx-background-color: #8d1d75;
+}
+#InputButton:hover{
+    -fx-border-color: purple;
+    -fx-background-color: DarkOrchid;
+}
+
+#DispButton{
+    -fx-border-color: #3465a4;
+    -fx-background-color: #5983b0;
+}
+#DispButton:hover{
+    -fx-border-color: steelblue;
+    -fx-background-color: royalblue;
+}
+
+#SoundButton{
+    -fx-border-color: #069a2e;
+    -fx-background-color: #3faf46;
+}
+#SoundButton:hover{
+    -fx-border-color: #3faf46;
+    -fx-background-color: LimeGreen;
+}
+
+#AllButton{
+    -fx-border-color: #999999;
+    -fx-background-color: black;
+}
+#AllButton:hover{
+    -fx-border-color: #CCCCCC;
+    -fx-background-color: #333333;
+}
+
+.button:hover{
+    -fx-border-color: skyblue;
+}
