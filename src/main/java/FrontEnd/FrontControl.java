@@ -156,33 +156,39 @@ public class FrontControl {
 
         //set key handler for key press
         allPane.setOnKeyPressed(eh -> {
-            //if keypress has not yet been registered
-            if (!inputObject.isKeyPressRegistered()){
-                //if all characters are to be detected OR
-                //if the keypress is in the allowed characters list
-                if (inputObject.getAllowedCharacters() == null
-                        || inputObject.getAllowedCharacters().contains(eh.getCode().getChar().charAt(0))){
-                    inputObject.registerKeyPress(eh.getCode());
+            //if the input object is on the bus
+            if (Bus.devices.contains(inputObject)) {
+                //if keypress has not yet been registered
+                if (!inputObject.isKeyPressRegistered()) {
+                    //if all characters are to be detected OR
+                    //if the keypress is in the allowed characters list
+                    if (inputObject.getAllowedCharacters() == null
+                            || inputObject.getAllowedCharacters().contains(eh.getCode().getChar().charAt(0))) {
+                        inputObject.registerKeyPress(eh.getCode());
 
-                    //if we should send a IRQ for this keypress,
-                    if(inputObject.isSendKeyPressInterrupts()){
-                        Bus.processor.IRQ();
+                        //if we should send a IRQ for this keypress,
+                        if (inputObject.isSendKeyPressInterrupts()) {
+                            Bus.processor.IRQ();
+                        }
                     }
+                    inputObject.setKeyPressRegistered(true);
+                    //update the debug pane
+                    updateDebuggerTA();
                 }
-                inputObject.setKeyPressRegistered(true);
-                //update the debug pane if Input item is on the bus
-                if(Bus.devices.contains(inputObject)) updateDebuggerTA();
             }
         });
         allPane.setOnKeyReleased( eh -> {
-            if(!inputObject.isStickyKeys()){
-                //reset to 0x0000 using key 0x0000
-                inputObject.clearKey();
+            //if the input object is on the bus
+            if(Bus.devices.contains(inputObject)) {
+                if (!inputObject.isStickyKeys()) {
+                    //reset to 0x0000 using key 0x0000
+                    inputObject.clearKey();
+                }
+                //open for new keypress
+                inputObject.setKeyPressRegistered(false);
+                //update the debug pane if Input item is on the bus
+                if (Bus.devices.contains(inputObject)) updateDebuggerTA();
             }
-            //open for new keypress
-            inputObject.setKeyPressRegistered(false);
-            //update the debug pane if Input item is on the bus
-            if(Bus.devices.contains(inputObject)) updateDebuggerTA();
         });
 
 
@@ -596,7 +602,7 @@ public class FrontControl {
                     //disconnect if already connected
                     Bus.devices.remove(inputObject);
                     //redraw the debug screen after defaulting to first object if the current object is inputObject
-                    if(debuggerLookAt == inputObject)
+                    if(debuggerLookAt == inputObject || debuggerLookAt == null)
                         debuggerDropdown.getSelectionModel().select(0);
                     updateDebuggerTA();
                 }
