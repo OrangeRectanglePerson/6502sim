@@ -9,7 +9,7 @@
     -fx-background-color: #cc0000;
 }
 #autoClockButt:hover{
-    -fx-border-color:  skyblue;
+    -fx-border-color:  lightblue;
 }
 
 #ResetButt{
@@ -17,7 +17,7 @@
     -fx-background-color: #ffff00;
 }
 #ResetButt:hover{
-    -fx-border-color: white;
+    -fx-border-color: lightgrey;
 }
 
 #StepClockButt{
@@ -82,6 +82,9 @@
     -fx-background-color: #333333;
 }
 
+.button {
+    -fx-background-color: lightgrey;
+}
 .button:hover{
-    -fx-border-color: skyblue;
+    -fx-border-color: CornflowerBlue;
 }
