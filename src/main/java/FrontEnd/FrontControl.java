@@ -513,8 +513,10 @@ public class FrontControl {
                     for(Device d : Bus.devices){
                         // check if proposed address is taken
                         if(d != inputObject
-                                && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(editAddr)
-                                && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(editAddr+1)))) {
+                                && (Short.toUnsignedInt(editAddr) >= Short.toUnsignedInt(d.getStartAddress())
+                                && Short.toUnsignedInt(editAddr) <= Short.toUnsignedInt(d.getEndAddress()))
+                                || Short.toUnsignedInt((short)(editAddr+1)) >= Short.toUnsignedInt(d.getStartAddress())
+                                && Short.toUnsignedInt((short)(editAddr+1)) <= Short.toUnsignedInt(d.getEndAddress())) {
                             isAddrTaken = true; break;
                         }
                     }
@@ -564,10 +566,11 @@ public class FrontControl {
 
                     for(Device d : Bus.devices){
                         // check if proposed address is taken
-                        if((Short.toUnsignedInt(inputObject.getStartAddress()) >= d.getStartAddress()
-                                && Short.toUnsignedInt(inputObject.getStartAddress()) <= d.getEndAddress())
-                                || (Short.toUnsignedInt(inputObject.getEndAddress()) >= d.getStartAddress()
-                                && Short.toUnsignedInt(inputObject.getEndAddress()) <= d.getEndAddress())) {
+                        if(d != inputObject
+                                && (Short.toUnsignedInt(inputObject.getStartAddress()) >= Short.toUnsignedInt(d.getStartAddress())
+                                && Short.toUnsignedInt(inputObject.getStartAddress()) <= Short.toUnsignedInt(d.getEndAddress()))
+                                || Short.toUnsignedInt(inputObject.getEndAddress()) >= Short.toUnsignedInt(d.getStartAddress())
+                                && Short.toUnsignedInt(inputObject.getEndAddress()) <= Short.toUnsignedInt(d.getEndAddress())) {
                             isAddrTaken = true; break;
                         }
                     }
@@ -772,6 +775,7 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
+                                                //check if the start of the object will become consumed by the addr change
                                                 && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
                                                 && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 511)))) {
                                             isAddrTaken = true;
@@ -810,6 +814,7 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
+                                                //check if the start of the object will become consumed by the addr change
                                                 && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
                                                 && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 4095)))) {
                                             isAddrTaken = true;
@@ -848,6 +853,7 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
+                                                //check if the start of the object will become consumed by the addr change
                                                 && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
                                                 && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 2047)))) {
                                             isAddrTaken = true;
@@ -886,6 +892,7 @@ public class FrontControl {
                                     for (Device d : Bus.devices) {
                                         // check if proposed address is taken
                                         if (d != selectedDisplay.get()
+                                                //check if the start of the object will become consumed by the addr change
                                                 && (Short.toUnsignedInt(d.getStartAddress()) >= Short.toUnsignedInt(selectedDisplay.get().getStartAddress())
                                                 && Short.toUnsignedInt(d.getStartAddress()) <= Short.toUnsignedInt((short)(selectedDisplay.get().getStartAddress() + 16383)))) {
                                             isAddrTaken = true;
