@@ -1,6 +1,7 @@
 package FrontEnd;
 
 import Devices.*;
+import Extras.DeviceComparator;
 import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
 import javafx.animation.KeyFrame;
@@ -8,18 +9,23 @@ import javafx.animation.Timeline;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
+import javafx.geometry.HPos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -966,6 +972,8 @@ public class FrontControl {
         devicePane.getChildren().add(dc.drawDetailedMenu());
     }
 
+/*
+    //button handler for scrapped sound emulation
     @FXML
     protected void onSoundButtonClick(){
         DeviceController dc = () -> {
@@ -983,20 +991,107 @@ public class FrontControl {
         devicePane.getChildren().clear();
         devicePane.getChildren().add(dc.drawDetailedMenu());
     }
+ */
 
     @FXML
     protected void onAllButtonClick(){
         DeviceController dc = () -> {
+            //sort the Bus.Devices observable list
+            Bus.devices.sort(new DeviceComparator());
+
             VBox returnedPane = new VBox();
 
-            Label menuLabel = new Label("A More Customisable App Coming Soon!");
+            ScrollPane listOfDevicesSP = new ScrollPane();
+
+            VBox insideVBox = new VBox();
+            insideVBox.setStyle("-fx-alignment: top-center; -fx-spacing: 5; -fx-background-color: white;");
+
+            ArrayList<Button> delButtons = new ArrayList<>();
+
+            for(Device d : Bus.devices){
+                GridPane deviceGP = new GridPane();
+
+                Label deviceName = new Label(d.getDeviceName());
+                deviceName.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 14; -fx-font-weight: bold; -fx-wrap-text: true");
+                GridPane.setColumnIndex(deviceName,0); GridPane.setRowIndex(deviceName,0);
+                GridPane.setHgrow(deviceName, Priority.ALWAYS);
+                GridPane.setHalignment(deviceName, HPos.CENTER);
+
+                TextField startAddrTF = new TextField(); startAddrTF.setEditable(false);
+                startAddrTF.setPrefWidth(100);
+                startAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getStartAddress()))).replace(' ','0'));
+                startAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
+                GridPane.setColumnIndex(startAddrTF,1); GridPane.setRowIndex(startAddrTF,0);
+
+                TextField endAddrTF = new TextField(); endAddrTF.setEditable(false);
+                endAddrTF.setPrefWidth(100);
+                endAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getEndAddress()))).replace(' ','0'));
+                endAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
+                GridPane.setColumnIndex(endAddrTF,2); GridPane.setRowIndex(endAddrTF,0);
+
+                Button deleteDeviceButt = new Button("Delete");
+                deleteDeviceButt.setStyle("""
+                -fx-font-family: Monospaced; -fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: white;
+                -fx-background-color: maroon; -fx-border-color: red; -fx-border-width: 3""");
+                GridPane.setColumnIndex(deleteDeviceButt, 2); GridPane.setRowIndex(deleteDeviceButt,1);
+                GridPane.setHalignment(deleteDeviceButt, HPos.CENTER);
+                delButtons.add(deleteDeviceButt);
+
+                Tooltip DDBTooltip = new Tooltip("WARNING!\nTHIS WILL DELETE THE DEVICE \"" + d.getDeviceName() + "\"!");
+                DDBTooltip.setStyle("-fx-background-color: red; -fx-text-alignment: center; -fx-font: bold 14 sans-serif");
+                DDBTooltip.setShowDelay(Duration.millis(5));
+                deleteDeviceButt.setTooltip(DDBTooltip);
+
+                deleteDeviceButt.setOnAction( eh-> {
+                    if((Bus.devices.size() == 2 && Bus.devices.contains(inputObject))
+                        || (Bus.devices.size() == 1 && !Bus.devices.contains(inputObject))){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("BRUH!");
+                        a.setHeaderText("You cannot have less than 1 device on the bus! (excluding input device)");
+                        a.showAndWait();
+                    } else {
+                        int deletingDeviceIndex = delButtons.indexOf(deleteDeviceButt);
+                        if(Bus.devices.get(deletingDeviceIndex) == inputObject){
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Too Bad!");
+                            a.setHeaderText("Please remove input object from bus via input device's menu");
+                            a.showAndWait();
+                        } else {
+                            Bus.devices.remove(deletingDeviceIndex);
+                            debuggerDropdown.getSelectionModel().select(Bus.devices.get(0));
+                            AllButton.fire();
+                        }
+                    }
+                });
+
+                // TODO: 26/9/2022 add functionality to add and edit devices
+
+                deviceGP.getChildren().addAll(deviceName,startAddrTF,endAddrTF , deleteDeviceButt);
+
+                if(d.getClass().getSimpleName().equals("ROM")) deviceGP.setStyle("-fx-background-color: #ea7500; -fx-border-color: #ff860d;");
+                if (d.getClass().getSimpleName().equals("RAM")) deviceGP.setStyle("-fx-background-color: #d84315; -fx-border-color: #ff5429;");
+                if (d.getClass().getSimpleName().equals("Input")) deviceGP.setStyle("-fx-background-color: #8d1d75; -fx-border-color: #780373;");
+                if (d.getClass().getSimpleName().equals("Display")) deviceGP.setStyle("-fx-background-color: #5983b0; -fx-border-color: #3465a4;");
+                deviceGP.setStyle(deviceGP.getStyle() +
+                        "-fx-padding: 3; -fx-border-radius: 5; -fx-background-insets: 3; -fx-border-width: 3; -fx-hgap: 5; -fx-vgap: 5;");
+                //deviceGP.setAlignment(Pos.CENTER);
+
+                insideVBox.getChildren().add(deviceGP);
+            }
+
+            Label menuLabel = new Label("All Devices");
             menuLabel.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 18; -fx-text-background-color: white");
             returnedPane.getChildren().add(menuLabel);
+
+            listOfDevicesSP.setContent(insideVBox);
+            insideVBox.prefWidthProperty().bind(listOfDevicesSP.widthProperty().subtract(25));
+            listOfDevicesSP.prefHeight(devicePane.getHeight()-menuLabel.getHeight());
+            listOfDevicesSP.setStyle("-fx-border-width: 3; -fx-border-color: #999999; -fx-alignment: center;");
+            returnedPane.getChildren().add(listOfDevicesSP);
 
             returnedPane.setStyle("-fx-border-width: 3; -fx-border-color: #999999; -fx-padding: 10; -fx-alignment: top-center; -fx-spacing: 5");
             returnedPane.setPrefHeight(devicePane.getHeight());
 
-            returnedPane.getChildren().add(new Label("AllButton"));
             return returnedPane;
         };
         devicePane.getChildren().clear();

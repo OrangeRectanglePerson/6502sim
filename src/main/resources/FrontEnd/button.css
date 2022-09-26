@@ -64,6 +64,7 @@
     -fx-background-color: royalblue;
 }
 
+/*
 #SoundButton{
     -fx-border-color: #069a2e;
     -fx-background-color: #3faf46;
@@ -72,6 +73,7 @@
     -fx-border-color: #3faf46;
     -fx-background-color: LimeGreen;
 }
+*/
 
 #AllButton{
     -fx-border-color: #999999;
@@ -80,6 +82,15 @@
 #AllButton:hover{
     -fx-border-color: #CCCCCC;
     -fx-background-color: #333333;
+}
+
+#debuggerShowAllButt{
+    -fx-border-color: lightgrey;
+    -fx-background-color: silver;
+}
+#debuggerShowAllButt:hover{
+    -fx-border-color: red;
+    -fx-background-color: lightgrey;
 }
 
 .button {

@@ -38,11 +38,6 @@
                         <Font name="Consolas" size="16.0" />
                      </font>
                   </Button>
-                  <Button fx:id="SoundButton" alignment="CENTER" layoutX="178.0" layoutY="10.0" mnemonicParsing="false" onAction="#onSoundButtonClick" stylesheets="@button.css" text="Sound" textAlignment="CENTER">
-                     <font>
-                        <Font name="Consolas" size="16.0" />
-                     </font>
-                  </Button>
                   <Button fx:id="AllButton" alignment="CENTER" layoutX="234.0" layoutY="10.0" mnemonicParsing="false" onAction="#onAllButtonClick" stylesheets="@button.css" text="All" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="Consolas" size="16.0" />

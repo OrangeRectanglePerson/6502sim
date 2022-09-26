@@ -53,4 +53,8 @@ public abstract class Device {
         String endHex = Integer.toHexString(Short.toUnsignedInt(this.endAddress));
         return String.format("%s%n0x%4s -> 0x%4s",this.deviceName, startHex, endHex);
     }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
 }

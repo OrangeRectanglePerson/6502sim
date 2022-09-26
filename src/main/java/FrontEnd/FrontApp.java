@@ -14,8 +14,6 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
-import static FrontEnd.SplashScreen.splash;
-
 public class FrontApp extends Application {
     @Override
     public void init(){
@@ -63,7 +61,7 @@ public class FrontApp extends Application {
                     FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
                     Scene scene = new Scene(fxmlLoader.load());
                     stage.setResizable(true);
-                    stage.setTitle("6502 microprocessor microcomputer Va.4.1");
+                    stage.setTitle("6502 microprocessor microcomputer Va.5");
                     stage.setScene(scene);
                     stage.setResizable(false);
                 }
