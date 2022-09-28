@@ -145,6 +145,10 @@ public class Display extends Device{
 
     public int getVRAMSize(){
         return currVRAM.length;
+        // 512   -> 64BW
+        // 4096  -> 64RGB
+        // 2048  -> 128BW
+        // 16384 -> 128RGB
     }
 
 

@@ -25,8 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -525,15 +524,21 @@ public class FrontControl {
                     for(Device d : Bus.devices){
                         // check if proposed address is taken
                         if(d != inputObject
-                                && (Short.toUnsignedInt(editAddr) >= Short.toUnsignedInt(d.getStartAddress())
+                                && ((Short.toUnsignedInt(editAddr) >= Short.toUnsignedInt(d.getStartAddress())
                                 && Short.toUnsignedInt(editAddr) <= Short.toUnsignedInt(d.getEndAddress()))
-                                || Short.toUnsignedInt((short)(editAddr+1)) >= Short.toUnsignedInt(d.getStartAddress())
-                                && Short.toUnsignedInt((short)(editAddr+1)) <= Short.toUnsignedInt(d.getEndAddress())) {
+                                || (Short.toUnsignedInt((short)(editAddr+1)) >= Short.toUnsignedInt(d.getStartAddress())
+                                && Short.toUnsignedInt((short)(editAddr+1)) <= Short.toUnsignedInt(d.getEndAddress())))) {
                             isAddrTaken = true; break;
                         }
                     }
 
-                    if(isAddrTaken){
+                    if (editAddr == (short)0xffff) {
+                        // firstly, are you trying to 0xffff to 0x0000 me
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Bad Value!");
+                        a.setHeaderText("Input Device needs at least 2 free address spaces!");
+                        a.showAndWait();
+                    } else if(isAddrTaken){
                         // is new address space is already taken by other devices
                         Alert a = new Alert(Alert.AlertType.ERROR);
                         a.setTitle("Bad Value!");
@@ -749,14 +754,16 @@ public class FrontControl {
             DisplayCB.getSelectionModel().selectedItemProperty().addListener(
                     (observableValue, oldDisp, newDisp) -> {
                         selectedDisplay.set(newDisp);
-                        iv.setImage(selectedDisplay.get().getFrame());
-                        modeCB.setDisable(false);
-                        justSwitchedDisplay.set(true);
-                        if (selectedDisplay.get().getVRAMSize() == 512) modeCB.getSelectionModel().select(0);
-                        if (selectedDisplay.get().getVRAMSize() == 4096) modeCB.getSelectionModel().select(1);
-                        if (selectedDisplay.get().getVRAMSize() == 2048) modeCB.getSelectionModel().select(2);
-                        if (selectedDisplay.get().getVRAMSize() == 16348) modeCB.getSelectionModel().select(3);
-                        justSwitchedDisplay.set(false);
+                        if (selectedDisplay.get() != null) {
+                            iv.setImage(selectedDisplay.get().getFrame());
+                            modeCB.setDisable(false);
+                            justSwitchedDisplay.set(true);
+                            if (selectedDisplay.get().getVRAMSize() == 512) modeCB.getSelectionModel().select(0);
+                            if (selectedDisplay.get().getVRAMSize() == 4096) modeCB.getSelectionModel().select(1);
+                            if (selectedDisplay.get().getVRAMSize() == 2048) modeCB.getSelectionModel().select(2);
+                            if (selectedDisplay.get().getVRAMSize() == 16348) modeCB.getSelectionModel().select(3);
+                            justSwitchedDisplay.set(false);
+                        }
                     }
             );
 
@@ -1006,8 +1013,6 @@ public class FrontControl {
             VBox insideVBox = new VBox();
             insideVBox.setStyle("-fx-alignment: top-center; -fx-spacing: 5; -fx-background-color: white;");
 
-            ArrayList<Button> delButtons = new ArrayList<>();
-
             for(Device d : Bus.devices){
                 GridPane deviceGP = new GridPane();
 
@@ -1017,13 +1022,20 @@ public class FrontControl {
                 GridPane.setHgrow(deviceName, Priority.ALWAYS);
                 GridPane.setHalignment(deviceName, HPos.CENTER);
 
-                TextField startAddrTF = new TextField(); startAddrTF.setEditable(false);
+                TextField startAddrTF = new TextField();
+                if(d.getClass().getSimpleName().equals("Input") ){
+                    startAddrTF.setDisable(true);
+                }
                 startAddrTF.setPrefWidth(100);
                 startAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getStartAddress()))).replace(' ','0'));
                 startAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
                 GridPane.setColumnIndex(startAddrTF,1); GridPane.setRowIndex(startAddrTF,0);
 
-                TextField endAddrTF = new TextField(); endAddrTF.setEditable(false);
+                TextField endAddrTF = new TextField();
+                if(d.getClass().getSimpleName().equals("Display")
+                        || d.getClass().getSimpleName().equals("Input") ){
+                    endAddrTF.setDisable(true);
+                }
                 endAddrTF.setPrefWidth(100);
                 endAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getEndAddress()))).replace(' ','0'));
                 endAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
@@ -1035,13 +1047,18 @@ public class FrontControl {
                 -fx-background-color: maroon; -fx-border-color: red; -fx-border-width: 3""");
                 GridPane.setColumnIndex(deleteDeviceButt, 2); GridPane.setRowIndex(deleteDeviceButt,1);
                 GridPane.setHalignment(deleteDeviceButt, HPos.CENTER);
-                delButtons.add(deleteDeviceButt);
+
+                Button editDeviceButt = new Button("Edit");
+                GridPane.setColumnIndex(editDeviceButt, 1); GridPane.setRowIndex(editDeviceButt,1);
+                GridPane.setHalignment(editDeviceButt, HPos.CENTER);
+                editDeviceButt.setVisible(false);
 
                 Tooltip DDBTooltip = new Tooltip("WARNING!\nTHIS WILL DELETE THE DEVICE \"" + d.getDeviceName() + "\"!");
                 DDBTooltip.setStyle("-fx-background-color: red; -fx-text-alignment: center; -fx-font: bold 14 sans-serif");
                 DDBTooltip.setShowDelay(Duration.millis(5));
                 deleteDeviceButt.setTooltip(DDBTooltip);
 
+                //delete device button handler
                 deleteDeviceButt.setOnAction( eh-> {
                     if((Bus.devices.size() == 2 && Bus.devices.contains(inputObject))
                         || (Bus.devices.size() == 1 && !Bus.devices.contains(inputObject))){
@@ -1050,23 +1067,142 @@ public class FrontControl {
                         a.setHeaderText("You cannot have less than 1 device on the bus! (excluding input device)");
                         a.showAndWait();
                     } else {
-                        int deletingDeviceIndex = delButtons.indexOf(deleteDeviceButt);
-                        if(Bus.devices.get(deletingDeviceIndex) == inputObject){
+
+                        if(d == inputObject){
                             Alert a = new Alert(Alert.AlertType.ERROR);
                             a.setTitle("Too Bad!");
                             a.setHeaderText("Please remove input object from bus via input device's menu");
                             a.showAndWait();
                         } else {
-                            Bus.devices.remove(deletingDeviceIndex);
+                            Bus.devices.remove(d);
                             debuggerDropdown.getSelectionModel().select(Bus.devices.get(0));
                             AllButton.fire();
                         }
                     }
+
+
                 });
 
-                // TODO: 26/9/2022 add functionality to add and edit devices
+                // TODO: 28/9/2022 add functionality to add devices
 
-                deviceGP.getChildren().addAll(deviceName,startAddrTF,endAddrTF , deleteDeviceButt);
+                //editing
+                //listen for changes in TFs
+                startAddrTF.textProperty().addListener( (obs, oldVal, newVal) -> {
+                    if(!editDeviceButt.isVisible()) editDeviceButt.setVisible(true);
+
+                    //autoedit end address for fixed address size display objects based on new start address
+                    String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
+                    int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+
+                    if (d.getClass().getSimpleName().equals("Display")){
+                        endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + ((Display) d).getVRAMSize() - 1)).replace(' ','0'));
+                    }
+                });
+                endAddrTF.textProperty().addListener( (obs, oldVal, newVal) -> {
+                    if(!editDeviceButt.isVisible()) editDeviceButt.setVisible(true);
+                });
+
+                //on buttonpress
+                editDeviceButt.setOnAction( eh -> {
+
+                    String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
+                    String newEndAddrString = endAddrTF.getText().replaceFirst("0x", "");
+
+                    int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+                    int newEndAddr = Integer.parseInt(newEndAddrString, 16);
+
+                    //input object handler
+                    if(d == inputObject){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Too Bad!");
+                        a.setHeaderText("Please edit input object's parameters via input device's menu");
+                        a.showAndWait();
+                    }
+                    // ram, rom and display device handler (mainly)
+                    else {
+                        try {
+
+                            /*
+                            if (d.getClass().getSimpleName().equals("Device")){
+                                //firstly, if d is Display, check if hind addr is being edited
+                                //we dont want to manually edit hind addr
+                                if (newEndAddr != Short.toUnsignedInt(d.getEndAddress())){
+                                    Alert a = new Alert(Alert.AlertType.ERROR);
+                                    a.setTitle("Uneditable!");
+                                    a.setHeaderText("You should NOT edit display addres space manually");
+                                    a.setContentText("Display requires strict address space size.\n"
+                                                    + "You can change address space usage by changing display mode in display device menu.");
+                                    a.showAndWait();
+                                    //display new/old values
+                                    editDeviceButt.setVisible(false);
+                                    startAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getStartAddress()))).replace(' ','0'));
+                                    endAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getEndAddress()))).replace(' ','0'));
+                                    editDeviceButt.setVisible(false);
+                                    //stop
+                                    return;
+                                }
+                                else{
+                                    //the new end address should be start address + VRAM size
+                                }
+                            }
+
+                             */
+
+                            boolean isAddrTaken = false;
+
+                            for (Device d1 : Bus.devices) {
+                                // check if proposed address is taken
+                                if (d1 != d
+                                        && ((newStartAddr >= Short.toUnsignedInt(d1.getStartAddress())
+                                        && newStartAddr <= Short.toUnsignedInt(d1.getEndAddress()))
+                                        || (newEndAddr >= Short.toUnsignedInt(d1.getStartAddress())
+                                        && newEndAddr <= Short.toUnsignedInt(d1.getEndAddress())))) {
+                                    isAddrTaken = true;
+                                    break;
+                                }
+                            }
+
+                            if (newEndAddr < newStartAddr) {
+                                //firstly are you trying to put your end addr before new addr?
+                                Alert a = new Alert(Alert.AlertType.ERROR);
+                                a.setTitle("Bad Value!");
+                                a.setHeaderText("Devices' end address cannot be in front of start address");
+                                a.showAndWait();
+                            } else if (isAddrTaken) {
+                                // is new address space is already taken by other devices
+                                Alert a = new Alert(Alert.AlertType.ERROR);
+                                a.setTitle("Bad Value!");
+                                a.setHeaderText("Proposed Address space is already taken!");
+                                a.showAndWait();
+                            } else {
+                                // else set new address & update the Label
+                                d.setStartAddress((short) newStartAddr);
+                                d.setEndAddress((short) newEndAddr);
+                                editDeviceButt.setVisible(false);
+                            }
+                        } catch (NumberFormatException nfe) {
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Bad Value!");
+                            a.setHeaderText("values given for new address is bad!");
+                            a.showAndWait();
+                        }
+                    }
+                    //display new/old values
+                    editDeviceButt.setVisible(false);
+                    startAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getStartAddress()))).replace(' ','0'));
+                    endAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getEndAddress()))).replace(' ','0'));
+                    editDeviceButt.setVisible(false);
+                    // refresh the choice box menu and debugger
+                    Device currSel = debuggerLookAt;
+                    Bus.devices.remove(d);
+                    Bus.devices.add(d);
+                    Bus.devices.sort(new DeviceComparator());
+                    debuggerDropdown.getSelectionModel().select(currSel);
+                    updateDebuggerTA();
+
+                });
+
+                deviceGP.getChildren().addAll(deviceName,startAddrTF,endAddrTF , deleteDeviceButt, editDeviceButt);
 
                 if(d.getClass().getSimpleName().equals("ROM")) deviceGP.setStyle("-fx-background-color: #ea7500; -fx-border-color: #ff860d;");
                 if (d.getClass().getSimpleName().equals("RAM")) deviceGP.setStyle("-fx-background-color: #d84315; -fx-border-color: #ff5429;");

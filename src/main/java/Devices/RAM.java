@@ -39,4 +39,17 @@ public class RAM extends Device{
         super.activelyWrite(requestAdr, data);
     }
 
+    @Override
+    public void setStartAddress(short _startAddress) {
+        super.setStartAddress(_startAddress);
+        if(Short.compareUnsigned(endAddress,startAddress)+1 > 0) this.storage = new byte[Short.compareUnsigned(endAddress,startAddress)+1];
+        else this.storage = null;
+    }
+
+    @Override
+    public void setEndAddress(short _endAddress) {
+        super.setEndAddress(_endAddress);
+        if(Short.compareUnsigned(endAddress,startAddress)+1 > 0) this.storage = new byte[Short.compareUnsigned(endAddress,startAddress)+1];
+        else this.storage = null;
+    }
 }
