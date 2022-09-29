@@ -1150,6 +1150,7 @@ public class FrontControl {
                                 }
                             }
 
+                            // TODO: 30/9/2022 add detection for if new start address causes address to overflow
                             if (newEndAddr < newStartAddr) {
                                 //firstly are you trying to put your end addr before new addr?
                                 Alert a = new Alert(Alert.AlertType.ERROR);
