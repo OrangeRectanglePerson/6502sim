@@ -6,17 +6,16 @@ import MainComComponents.Bus;
 import MainComComponents.CPUFlags;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -25,7 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -202,6 +202,7 @@ public class FrontControl {
     @FXML
     protected void onROMButtonClick(){
         DeviceController dc = () -> {
+            // TODO: 30/9/2022 add tooltips to choiceboxes
             AtomicReference<ROM> selectedROM = new AtomicReference<>();
 
             ChoiceBox<ROM> ROMCB = new ChoiceBox<>();
@@ -352,6 +353,7 @@ public class FrontControl {
     @FXML
     protected void onRAMButtonClick(){
         DeviceController dc = () -> {
+            // TODO: 30/9/2022 add tooltops to choiceboxes
             AtomicReference<RAM> selectedRAM = new AtomicReference<>();
 
             TextArea RAMDisp = new TextArea("Select A RAM Device to view");
@@ -508,7 +510,9 @@ public class FrontControl {
 
 
             TextField addressTF = new TextField();
-            addressTF.setPromptText("short new address (hex value)");
+            addressTF.setPromptText(String.format("Current_Start_Address_:_0x%4s._",
+                            Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress())))
+                    .replace(' ','0').replace('_',' ') + "Type in new start address here.");
 
             ToolBar addrEditorButts = new ToolBar();
 
@@ -516,8 +520,11 @@ public class FrontControl {
 
             addressButt.setOnAction( eh -> {
                 short editAddr;
+
+                String newStartAddrString = addressTF.getText().replaceFirst("0x", "");
+
                 try{
-                    editAddr = (short)Integer.parseInt(addressTF.getText(),16);
+                    editAddr = (short)Integer.parseInt(newStartAddrString,16);
 
                     boolean isAddrTaken = false;
 
@@ -551,8 +558,15 @@ public class FrontControl {
                         String startAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress()));
                         String endAddrString = Integer.toHexString(Short.toUnsignedInt(inputObject.getEndAddress()));
 
+                        //update label and addressTF
                         currentAddrL.setText(String.format("Current_Address_:_0x%4s_0x%4s",startAddrString,endAddrString)
                                 .replace(' ','0').replace('_',' '));
+                        addressTF.setPromptText(String.format("Current_Start_Address_:_0x%4s._",
+                                        Integer.toHexString(Short.toUnsignedInt(inputObject.getStartAddress())))
+                                .replace(' ','0').replace('_',' ') + "Type in new start address here.");
+
+                        //clear addressTF
+                        addressTF.clear();
                     }
 
                 } catch (NumberFormatException nfe) {
@@ -1083,8 +1097,6 @@ public class FrontControl {
 
                 });
 
-                // TODO: 28/9/2022 add functionality to add devices
-
                 //editing
                 //listen for changes in TFs
                 startAddrTF.textProperty().addListener( (obs, oldVal, newVal) -> {
@@ -1092,24 +1104,23 @@ public class FrontControl {
 
                     //autoedit end address for fixed address size display objects based on new start address
                     String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
-                    int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+                    try {
+                        int newStartAddr = Integer.parseInt(newStartAddrString, 16);
 
-                    if (d.getClass().getSimpleName().equals("Display")){
-                        endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + ((Display) d).getVRAMSize() - 1)).replace(' ','0'));
-                    }
+                        if (d.getClass().getSimpleName().equals("Display")) {
+                            endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + ((Display) d).getVRAMSize() - 1)).replace(' ', '0'));
+                        }
+                    } catch (NumberFormatException nfe){ /* ignored */ }
                 });
                 endAddrTF.textProperty().addListener( (obs, oldVal, newVal) -> {
                     if(!editDeviceButt.isVisible()) editDeviceButt.setVisible(true);
                 });
 
-                //on buttonpress
+                //on editing buttonpress
                 editDeviceButt.setOnAction( eh -> {
 
                     String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
                     String newEndAddrString = endAddrTF.getText().replaceFirst("0x", "");
-
-                    int newStartAddr = Integer.parseInt(newStartAddrString, 16);
-                    int newEndAddr = Integer.parseInt(newEndAddrString, 16);
 
                     //input object handler
                     if(d == inputObject){
@@ -1122,31 +1133,8 @@ public class FrontControl {
                     else {
                         try {
 
-                            /*
-                            if (d.getClass().getSimpleName().equals("Device")){
-                                //firstly, if d is Display, check if hind addr is being edited
-                                //we dont want to manually edit hind addr
-                                if (newEndAddr != Short.toUnsignedInt(d.getEndAddress())){
-                                    Alert a = new Alert(Alert.AlertType.ERROR);
-                                    a.setTitle("Uneditable!");
-                                    a.setHeaderText("You should NOT edit display addres space manually");
-                                    a.setContentText("Display requires strict address space size.\n"
-                                                    + "You can change address space usage by changing display mode in display device menu.");
-                                    a.showAndWait();
-                                    //display new/old values
-                                    editDeviceButt.setVisible(false);
-                                    startAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getStartAddress()))).replace(' ','0'));
-                                    endAddrTF.setText(String.format("0x%4s",Integer.toHexString(Short.toUnsignedInt(d.getEndAddress()))).replace(' ','0'));
-                                    editDeviceButt.setVisible(false);
-                                    //stop
-                                    return;
-                                }
-                                else{
-                                    //the new end address should be start address + VRAM size
-                                }
-                            }
-
-                             */
+                            int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+                            int newEndAddr = Integer.parseInt(newEndAddrString, 16);
 
                             boolean isAddrTaken = false;
 
@@ -1213,6 +1201,187 @@ public class FrontControl {
                 //deviceGP.setAlignment(Pos.CENTER);
 
                 insideVBox.getChildren().add(deviceGP);
+            }
+
+            //make a pane to append to the end of insideVBox
+            //it will create objects
+            {
+                GridPane addDeviceGP = new GridPane();
+                addDeviceGP.setStyle(addDeviceGP.getStyle() +
+                        "-fx-padding: 3; -fx-border-radius: 5; -fx-background-insets: 3; " +
+                        "-fx-border-width: 3; -fx-hgap: 5; -fx-vgap: 5; " +
+                        "-fx-background-color: black; -fx-border-color: #999999;");
+
+                Label titleL = new Label("Create New Device");
+                titleL.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 13.2; -fx-text-background-color: white");
+                GridPane.setColumnIndex(titleL,1); GridPane.setRowIndex(titleL,0);
+                GridPane.setHalignment(titleL, HPos.CENTER);
+
+                ChoiceBox<String> deviceTypeCB = new ChoiceBox<>(
+                        FXCollections.observableArrayList(
+                                "ROM", "RAM", "Display", "Cancel Creation"
+                        )
+                );
+                Tooltip DTCBTooltip = new Tooltip("Select type of Device to add.");
+                DTCBTooltip.setStyle("-fx-background-color: black; -fx-text-alignment: center; -fx-font: 13 sans-serif");
+                DTCBTooltip.setShowDelay(Duration.millis(10));
+                deviceTypeCB.setTooltip(DTCBTooltip);
+                GridPane.setColumnIndex(deviceTypeCB,0); GridPane.setRowIndex(deviceTypeCB,1);
+                GridPane.setHalignment(deviceTypeCB, HPos.CENTER);
+
+                TextField startAddrTF = new TextField();
+                startAddrTF.setPromptText("start address");
+                startAddrTF.setDisable(true);
+                startAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
+                GridPane.setColumnIndex(startAddrTF,1); GridPane.setRowIndex(startAddrTF,1);
+                GridPane.setHalignment(startAddrTF, HPos.CENTER);
+
+                TextField endAddrTF = new TextField();
+                endAddrTF.setPromptText("end address");
+                endAddrTF.setDisable(true);
+                endAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
+                GridPane.setColumnIndex(endAddrTF,2); GridPane.setRowIndex(endAddrTF,1);
+                GridPane.setHalignment(endAddrTF, HPos.CENTER);
+
+                Button addButton = new Button("Add Device");
+                // TODO: 30/9/2022 add adding funcionality
+
+                Button cancelCreationButt = new Button("Cancel");
+                cancelCreationButt.setOnAction( eh -> deviceTypeCB.getSelectionModel().clearSelection());
+
+                ArrayList<Node> additionalCreationNodes = new ArrayList<>();
+
+                //on selecting what type to create
+                deviceTypeCB.getSelectionModel().selectedItemProperty().addListener( (obs, oldval, newval) -> {
+                    addDeviceGP.getChildren().clear();
+                    additionalCreationNodes.clear();
+                    if (newval == null){
+                        //cancelled, disable both TFs
+                        startAddrTF.clear(); endAddrTF.clear();
+                        startAddrTF.setDisable(true); endAddrTF.setDisable(true);
+                        //revert back to "blank slate menu"
+                        addDeviceGP.getChildren().addAll(titleL, deviceTypeCB);
+                        return;
+                    } else if(newval.equals("ROM") || newval.equals("RAM")){
+                        //if creating rom or ram
+                        startAddrTF.clear(); endAddrTF.clear();
+                        startAddrTF.setDisable(false); endAddrTF.setDisable(false);
+                    } else if (newval.equals("Display")){
+                        //if creating display
+                        startAddrTF.clear(); endAddrTF.clear();
+                        startAddrTF.setDisable(false); endAddrTF.setDisable(true);
+
+                        // add custom extra settings CB for Display creation
+                        ChoiceBox<String> newDispModeCB = new ChoiceBox<>(
+                                FXCollections.observableArrayList(
+                                        "64x64 1 bit BW",
+                                        "64x64 6 bit RGB",
+                                        "128x128 1 bit BW",
+                                        "128x128 6 bit RGB"
+                                )
+                        );
+                        Tooltip NDMCBTooltip = new Tooltip("Select type of Display to add.");
+                        NDMCBTooltip.setStyle("-fx-background-color: black; -fx-text-alignment: center; -fx-font: 13 sans-serif");
+                        NDMCBTooltip.setShowDelay(Duration.millis(10));
+                        newDispModeCB.setTooltip(NDMCBTooltip);
+
+                        newDispModeCB.getSelectionModel().selectedIndexProperty().addListener((observableValue, NDMCBoldVal, NDMCBnewVal) -> {
+                            String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
+
+                            try{
+                                //autoedit end address for fixed address size display objects based on new start address
+
+                                int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+
+                                int newDisplayVRAMSize;
+
+                                // 512   -> 64BW
+                                // 4096  -> 64RGB
+                                // 2048  -> 128BW
+                                // 16384 -> 128RGB
+                                if(NDMCBnewVal.intValue() == 0) newDisplayVRAMSize = 512;
+                                else if(NDMCBnewVal.intValue() == 1) newDisplayVRAMSize = 4096;
+                                else if(NDMCBnewVal.intValue() == 2) newDisplayVRAMSize = 2048;
+                                else newDisplayVRAMSize = 16384;
+
+                                endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
+                                // TODO: 30/9/2022 add detection for if selected mode causes address to overflow
+
+                            } catch (NumberFormatException nfe) {
+                                endAddrTF.setText("Error");
+                            }
+                        });
+
+                        // add event handlers to the start addr TF to update end addr TF
+                        startAddrTF.textProperty().addListener( (observableValue, oldVal, newVal) -> {
+                            //autoedit end address for fixed address size display objects based on new start address
+                            if (deviceTypeCB.getSelectionModel().getSelectedItem().equals("Display")) {
+                                String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
+                                try {
+                                    int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+
+                                    int newDisplayVRAMSize;
+
+                                    // 512   -> 64BW
+                                    // 4096  -> 64RGB
+                                    // 2048  -> 128BW
+                                    // 16384 -> 128RGB
+                                    if(newDispModeCB.getSelectionModel().getSelectedIndex() == 0) newDisplayVRAMSize = 512;
+                                    else if(newDispModeCB.getSelectionModel().getSelectedIndex() == 1) newDisplayVRAMSize = 4096;
+                                    else if(newDispModeCB.getSelectionModel().getSelectedIndex() == 2) newDisplayVRAMSize = 2048;
+                                    else newDisplayVRAMSize = 16384;
+
+                                    endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
+
+                                } catch (NumberFormatException nfe) {
+                                    endAddrTF.setText("Error");
+                                }
+                            }
+                        });
+
+                        additionalCreationNodes.add(newDispModeCB);
+                    } else {
+                        //catchall (reverts to "blank slate" menu
+                        deviceTypeCB.getSelectionModel().clearSelection();
+                        return;
+                    }
+
+                    // refresh device creation pane to show device creation params
+                    addDeviceGP.getChildren().clear();
+                    addDeviceGP.getChildren().addAll(titleL, deviceTypeCB, startAddrTF, endAddrTF);
+
+                    int additionalNodeNum;
+                    for (additionalNodeNum = 0; additionalNodeNum < additionalCreationNodes.size(); additionalNodeNum++) {
+                        Node additionalSettingNode = additionalCreationNodes.get(additionalNodeNum);
+                        GridPane.setColumnIndex(additionalSettingNode, additionalNodeNum % 3);
+                        GridPane.setRowIndex(additionalSettingNode, 2 + (additionalNodeNum / 3));
+                        GridPane.setHalignment(endAddrTF, HPos.CENTER);
+
+                        addDeviceGP.getChildren().add(additionalSettingNode);
+                    }
+                    additionalNodeNum += 2;
+
+                    GridPane.setColumnIndex(addButton, 1);
+                    GridPane.setRowIndex(addButton, 2 + (additionalNodeNum / 3));
+                    GridPane.setHalignment(addButton, HPos.CENTER);
+
+                    GridPane.setColumnIndex(cancelCreationButt, 2);
+                    GridPane.setRowIndex(cancelCreationButt, 2 + (additionalNodeNum / 3));
+                    GridPane.setHalignment(cancelCreationButt, HPos.CENTER);
+
+                    addDeviceGP.getChildren().addAll(addButton, cancelCreationButt);
+                });
+
+                // add "blank slate" to pane
+                addDeviceGP.getChildren().addAll(titleL, deviceTypeCB);
+
+                ColumnConstraints colConstraints = new ColumnConstraints();
+                colConstraints.setPercentWidth(100/3.0);
+                colConstraints.setFillWidth(true);
+                addDeviceGP.getColumnConstraints().add(colConstraints);
+
+
+                insideVBox.getChildren().add(addDeviceGP);
             }
 
             Label menuLabel = new Label("All Devices");
