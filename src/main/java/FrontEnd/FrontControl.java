@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1149,7 +1148,7 @@ public class FrontControl {
                     //input object handler
                     if(d == inputObject){
                         Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setTitle("Too Bad!");
+                        a.setTitle("Unsupported Operation!");
                         a.setHeaderText("Please edit input object's parameters via input device's menu");
                         a.showAndWait();
                     }
@@ -1245,8 +1244,13 @@ public class FrontControl {
 
                 Label titleL = new Label("Create New Device");
                 titleL.setStyle("-fx-text-alignment: center; -fx-font-family: Monospaced; -fx-font-size: 13.2; -fx-text-background-color: white");
-                GridPane.setColumnIndex(titleL,1); GridPane.setRowIndex(titleL,0);
-                GridPane.setHalignment(titleL, HPos.CENTER);
+                GridPane.setColumnIndex(titleL,0); GridPane.setRowIndex(titleL,0);
+                GridPane.setColumnSpan(titleL, 2);
+
+                TextField newDeviceNameTF = new TextField();
+                newDeviceNameTF.setPromptText(currentTextRB.getString("newDeviceNameTFPrompt"));
+                newDeviceNameTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13;");
+                GridPane.setColumnIndex(newDeviceNameTF,2); GridPane.setRowIndex(newDeviceNameTF,0);
 
                 ChoiceBox<String> deviceTypeCB = new ChoiceBox<>(
                         FXCollections.observableArrayList(
@@ -1258,24 +1262,20 @@ public class FrontControl {
                 DTCBTooltip.setShowDelay(Duration.millis(10));
                 deviceTypeCB.setTooltip(DTCBTooltip);
                 GridPane.setColumnIndex(deviceTypeCB,0); GridPane.setRowIndex(deviceTypeCB,1);
-                GridPane.setHalignment(deviceTypeCB, HPos.CENTER);
 
                 TextField startAddrTF = new TextField();
                 startAddrTF.setPromptText("start address");
                 startAddrTF.setDisable(true);
                 startAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
                 GridPane.setColumnIndex(startAddrTF,1); GridPane.setRowIndex(startAddrTF,1);
-                GridPane.setHalignment(startAddrTF, HPos.CENTER);
 
                 TextField endAddrTF = new TextField();
                 endAddrTF.setPromptText("end address");
                 endAddrTF.setDisable(true);
                 endAddrTF.setStyle("-fx-font-family: Monospaced; -fx-font-size: 13");
                 GridPane.setColumnIndex(endAddrTF,2); GridPane.setRowIndex(endAddrTF,1);
-                GridPane.setHalignment(endAddrTF, HPos.CENTER);
 
                 Button addButton = new Button("Add Device");
-                // TODO: 30/9/2022 add adding funcionality
 
                 Button cancelCreationButt = new Button("Cancel");
                 cancelCreationButt.setOnAction( eh -> deviceTypeCB.getSelectionModel().clearSelection());
@@ -1386,14 +1386,13 @@ public class FrontControl {
 
                     // refresh device creation pane to show device creation params
                     addDeviceGP.getChildren().clear();
-                    addDeviceGP.getChildren().addAll(titleL, deviceTypeCB, startAddrTF, endAddrTF);
+                    addDeviceGP.getChildren().addAll(titleL, newDeviceNameTF, deviceTypeCB, startAddrTF, endAddrTF);
 
                     int additionalNodeNum;
                     for (additionalNodeNum = 0; additionalNodeNum < additionalCreationNodes.size(); additionalNodeNum++) {
                         Node additionalSettingNode = additionalCreationNodes.get(additionalNodeNum);
                         GridPane.setColumnIndex(additionalSettingNode, additionalNodeNum % 3);
                         GridPane.setRowIndex(additionalSettingNode, 2 + (additionalNodeNum / 3));
-                        GridPane.setHalignment(endAddrTF, HPos.CENTER);
 
                         addDeviceGP.getChildren().add(additionalSettingNode);
                     }
@@ -1401,23 +1400,102 @@ public class FrontControl {
 
                     GridPane.setColumnIndex(addButton, 1);
                     GridPane.setRowIndex(addButton, 2 + (additionalNodeNum / 3));
-                    GridPane.setHalignment(addButton, HPos.CENTER);
 
                     GridPane.setColumnIndex(cancelCreationButt, 2);
                     GridPane.setRowIndex(cancelCreationButt, 2 + (additionalNodeNum / 3));
-                    GridPane.setHalignment(cancelCreationButt, HPos.CENTER);
 
                     addDeviceGP.getChildren().addAll(addButton, cancelCreationButt);
+                });
+
+                //adding functionality
+                addButton.setOnAction( eh -> {
+                    String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
+                    String newEndAddrString = endAddrTF.getText().replaceFirst("0x", "");
+
+                    try {
+
+                        int newStartAddr = Integer.parseInt(newStartAddrString, 16);
+                        int newEndAddr = Integer.parseInt(newEndAddrString, 16);
+
+                        boolean isAddrTaken = false;
+
+                        for (Device d1 : Bus.devices) {
+                            // check if proposed address is taken
+                            if (((newStartAddr >= Short.toUnsignedInt(d1.getStartAddress())
+                                    && newStartAddr <= Short.toUnsignedInt(d1.getEndAddress()))
+                                    || (newEndAddr >= Short.toUnsignedInt(d1.getStartAddress())
+                                    && newEndAddr <= Short.toUnsignedInt(d1.getEndAddress())))) {
+                                isAddrTaken = true;
+                                break;
+                            }
+                        }
+
+                        if(!(Pattern.compile("[A-Fa-f0-9]{1,4}$").matcher(newStartAddrString).matches()
+                                && Pattern.compile("[A-Fa-f0-9]{1,4}$").matcher(newEndAddrString).matches())) {
+                            //check input length
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Bad Value!");
+                            a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                            a.showAndWait();
+                        } else if (newEndAddr < newStartAddr) {
+                            // are you trying to put your end addr before new addr?
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Bad Value!");
+                            a.setHeaderText("Devices' end address cannot be in front of start address");
+                            a.showAndWait();
+                        } else if (isAddrTaken) {
+                            // is new address space is already taken by other devices
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Bad Value!");
+                            a.setHeaderText("Proposed Address space is already taken!");
+                            a.showAndWait();
+                        } else {
+                            // initiate adding
+                            if(deviceTypeCB.getSelectionModel().getSelectedIndex() == 0){
+                                //add rom
+                                Bus.devices.add(new ROM(newDeviceNameTF.getText(),(short) newStartAddr,(short) newEndAddr));
+                            } else if(deviceTypeCB.getSelectionModel().getSelectedIndex() == 1){
+                                //add ram
+                                Bus.devices.add(new RAM(newDeviceNameTF.getText(),(short) newStartAddr,(short) newEndAddr));
+                            } else if(deviceTypeCB.getSelectionModel().getSelectedIndex() == 2){
+                                //add display
+                                Display displayToAdd = new Display(newDeviceNameTF.getText(), (short) newStartAddr);
+                                // 512   -> 64BW
+                                // 4096  -> 64RGB
+                                // 2048  -> 128BW
+                                // 16384 -> 128RGB
+                                if (newEndAddr - newStartAddr == 511) displayToAdd.setMode64BW();
+                                else if (newEndAddr - newStartAddr == 4095) displayToAdd.setMode64RGB();
+                                else if (newEndAddr - newStartAddr == 2048) displayToAdd.setMode128BW();
+                                else if (newEndAddr - newStartAddr == 16383) displayToAdd.setMode128RGB();
+                                Bus.devices.add(displayToAdd);
+                            }
+                            // refresh the choice box menu and debugger and sort
+                            Device currSel = debuggerLookAt;
+                            Bus.devices.sort(new DeviceComparator());
+                            debuggerDropdown.getSelectionModel().select(currSel);
+                            updateDebuggerTA();
+                            //restart the all pane
+                            AllButton.fire();
+                        }
+                    } catch (NumberFormatException nfe) {
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Bad Value!");
+                        a.setHeaderText("values given for new address is bad!");
+                        a.showAndWait();
+                    }
                 });
 
                 // add "blank slate" to pane
                 addDeviceGP.getChildren().addAll(titleL, deviceTypeCB);
 
                 ColumnConstraints colConstraints = new ColumnConstraints();
-                colConstraints.setPercentWidth(100/3.0);
+                colConstraints.setPercentWidth(100.0/2.75);
                 colConstraints.setFillWidth(true);
+                colConstraints.setHalignment(HPos.CENTER);
                 addDeviceGP.getColumnConstraints().add(colConstraints);
 
+                addDeviceGP.prefWidthProperty().bind(insideVBox.widthProperty());
 
                 insideVBox.getChildren().add(addDeviceGP);
             }
