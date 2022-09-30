@@ -1336,11 +1336,13 @@ public class FrontControl {
                                 else if(NDMCBnewVal.intValue() == 2) newDisplayVRAMSize = 2048;
                                 else newDisplayVRAMSize = 16384;
 
-                                endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
-                                // TODO: 30/9/2022 add detection for if selected mode causes address to overflow
+                                if(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1 > 65535){
+                                    //check if new address will overflow
+                                    endAddrTF.setText(currentTextRB.getString("error"));
+                                } else endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
 
                             } catch (NumberFormatException nfe) {
-                                endAddrTF.setText("Error");
+                                endAddrTF.setText(currentTextRB.getString("error"));
                             }
                         });
 
@@ -1364,10 +1366,13 @@ public class FrontControl {
                                     else if(newDispModeCB.getSelectionModel().getSelectedIndex() == 2) newDisplayVRAMSize = 2048;
                                     else newDisplayVRAMSize = 16384;
 
-                                    endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
+                                    if(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1 > 65535){
+                                        //check if new address will overflow
+                                        endAddrTF.setText(currentTextRB.getString("error"));
+                                    } else endAddrTF.setText(String.format("0x%4s", Integer.toHexString(Short.toUnsignedInt((short) newStartAddr) + newDisplayVRAMSize - 1)).replace(' ', '0'));
 
                                 } catch (NumberFormatException nfe) {
-                                    endAddrTF.setText("Error");
+                                    endAddrTF.setText(currentTextRB.getString("error"));
                                 }
                             }
                         });
