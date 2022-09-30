@@ -106,10 +106,9 @@ public class FrontControl {
     private Input inputObject;
 
 
+    // TODO: 9/30/2022 add internationalisation 
 
-
-
-
+    
     @FXML
     //initialising method for JFX
     public void initialize() {
@@ -539,7 +538,13 @@ public class FrontControl {
                         }
                     }
 
-                    if (editAddr == (short)0xffff) {
+                    if(!(Pattern.compile("[A-Fa-f0-9]{1,4}$").matcher(newStartAddrString).matches())) {
+                        //check input length
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Bad Value!");
+                        a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                        a.showAndWait();
+                    } else if (editAddr == (short)0xffff) {
                         // firstly, are you trying to 0xffff to 0x0000 me
                         Alert a = new Alert(Alert.AlertType.ERROR);
                         a.setTitle("Bad Value!");
@@ -1122,6 +1127,7 @@ public class FrontControl {
                     String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
                     String newEndAddrString = endAddrTF.getText().replaceFirst("0x", "");
 
+
                     //input object handler
                     if(d == inputObject){
                         Alert a = new Alert(Alert.AlertType.ERROR);
@@ -1150,9 +1156,15 @@ public class FrontControl {
                                 }
                             }
 
-                            // TODO: 30/9/2022 add detection for if new start address causes address to overflow
-                            if (newEndAddr < newStartAddr) {
-                                //firstly are you trying to put your end addr before new addr?
+                            if(!(Pattern.compile("[A-Fa-f0-9]{1,4}$").matcher(newStartAddrString).matches()
+                                    && Pattern.compile("[A-Fa-f0-9]{1,4}$").matcher(newEndAddrString).matches())) {
+                                //check input length
+                                Alert a = new Alert(Alert.AlertType.ERROR);
+                                a.setTitle("Bad Value!");
+                                a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                                a.showAndWait();
+                            } else if (newEndAddr < newStartAddr) {
+                                // are you trying to put your end addr before new addr?
                                 Alert a = new Alert(Alert.AlertType.ERROR);
                                 a.setTitle("Bad Value!");
                                 a.setHeaderText("Devices' end address cannot be in front of start address");
