@@ -25,7 +25,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -104,6 +106,8 @@ public class FrontControl {
 
     // stuff for input
     private Input inputObject;
+
+    private ResourceBundle currentTextRB = ResourceBundle.getBundle("words");
 
 
     // TODO: 9/30/2022 add internationalisation 
@@ -201,10 +205,13 @@ public class FrontControl {
     @FXML
     protected void onROMButtonClick(){
         DeviceController dc = () -> {
-            // TODO: 30/9/2022 add tooltips to choiceboxes
             AtomicReference<ROM> selectedROM = new AtomicReference<>();
 
             ChoiceBox<ROM> ROMCB = new ChoiceBox<>();
+            Tooltip ROMCBTooltip = new Tooltip(currentTextRB.getString("ROMCBTooltip"));
+            ROMCBTooltip.setStyle("-fx-text-alignment: center; -fx-font: 13 sans-serif");
+            ROMCBTooltip.setShowDelay(Duration.millis(10));
+            ROMCB.setTooltip(ROMCBTooltip);
             ROMCB.setPrefHeight(new Text("ROM\nROM").getLayoutBounds().getHeight() + 10);
             //initialise contents of ROMCB when ROM menu is entered
             ROMCB.getItems().clear();
@@ -352,7 +359,6 @@ public class FrontControl {
     @FXML
     protected void onRAMButtonClick(){
         DeviceController dc = () -> {
-            // TODO: 30/9/2022 add tooltops to choiceboxes
             AtomicReference<RAM> selectedRAM = new AtomicReference<>();
 
             TextArea RAMDisp = new TextArea("Select A RAM Device to view");
@@ -388,6 +394,10 @@ public class FrontControl {
 
             ChoiceBox<RAM> RAMCB = new ChoiceBox<>();
             RAMCB.setPrefHeight(new Text("RAM\nRAM").getLayoutBounds().getHeight() + 10);
+            Tooltip RAMCBTooltip = new Tooltip(currentTextRB.getString("RAMCBTooltip"));
+            RAMCBTooltip.setStyle("-fx-text-alignment: center; -fx-font: 13 sans-serif");
+            RAMCBTooltip.setShowDelay(Duration.millis(10));
+            RAMCB.setTooltip(RAMCBTooltip);
             //initialise contents of RAMCB when RAM menu is entered
             RAMCB.getItems().clear();
             for (Device d: Bus.devices) {
@@ -740,10 +750,18 @@ public class FrontControl {
                             .getResourceAsStream("/FrontEnd/select display to view.png"))));
 
             ChoiceBox<Display> DisplayCB = new ChoiceBox<>();
+            Tooltip DisplayCBTooltip = new Tooltip(currentTextRB.getString("DisplayCBTooltip"));
+            DisplayCBTooltip.setStyle("-fx-text-alignment: center; -fx-font: 13 sans-serif");
+            DisplayCBTooltip.setShowDelay(Duration.millis(10));
+            DisplayCB.setTooltip(DisplayCBTooltip);
             DisplayCB.setPrefHeight(new Text("DIS\nDIS").getLayoutBounds().getHeight() + 10);
 
             //define the mode choicebox now to make things easy
             ChoiceBox<String> modeCB = new ChoiceBox<>();
+            Tooltip displayModeCBTooltip = new Tooltip(currentTextRB.getString("displayModeCBTooltip"));
+            displayModeCBTooltip.setStyle("-fx-text-alignment: center; -fx-font: 13 sans-serif");
+            displayModeCBTooltip.setShowDelay(Duration.millis(10));
+            modeCB.setTooltip(displayModeCBTooltip);
             modeCB.setDisable(true);
             modeCB.getItems().addAll(
                     "64x64 1 bit BW",
