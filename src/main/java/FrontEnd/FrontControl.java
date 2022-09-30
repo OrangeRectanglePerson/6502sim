@@ -1311,6 +1311,7 @@ public class FrontControl {
                                         "128x128 6 bit RGB"
                                 )
                         );
+                        newDispModeCB.getSelectionModel().select(0);
                         Tooltip NDMCBTooltip = new Tooltip("Select type of Display to add.");
                         NDMCBTooltip.setStyle("-fx-background-color: black; -fx-text-alignment: center; -fx-font: 13 sans-serif");
                         NDMCBTooltip.setShowDelay(Duration.millis(10));
@@ -1346,7 +1347,8 @@ public class FrontControl {
                         // add event handlers to the start addr TF to update end addr TF
                         startAddrTF.textProperty().addListener( (observableValue, oldVal, newVal) -> {
                             //autoedit end address for fixed address size display objects based on new start address
-                            if (deviceTypeCB.getSelectionModel().getSelectedItem().equals("Display")) {
+                            if (deviceTypeCB.getSelectionModel().getSelectedItem() != null
+                                    && deviceTypeCB.getSelectionModel().getSelectedItem().equals("Display")) {
                                 String newStartAddrString = startAddrTF.getText().replaceFirst("0x", "");
                                 try {
                                     int newStartAddr = Integer.parseInt(newStartAddrString, 16);
