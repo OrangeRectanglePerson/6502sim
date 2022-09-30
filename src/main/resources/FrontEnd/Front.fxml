@@ -210,7 +210,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <Label alignment="CENTER" layoutX="126.0" layoutY="550.0" prefHeight="100.0" prefWidth="234.0" style="-fx-background-color: #00a8a9;" text="6502 Microcomputer Emulator&#10;[About Me Goes Here]" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="500.0">
+            <Label alignment="CENTER" layoutX="126.0" layoutY="550.0" onMouseClicked="#aboutMeClicked" prefHeight="100.0" prefWidth="234.0" style="-fx-background-color: #00a8a9;" text="6502 Microcomputer Emulator&#10;[For Credits Click Here]" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="500.0">
                <font>
                   <Font name="Consolas" size="18.0" />
                </font>

@@ -10,14 +10,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -551,7 +556,7 @@ public class FrontControl {
                         //check input length
                         Alert a = new Alert(Alert.AlertType.ERROR);
                         a.setTitle("Bad Value!");
-                        a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                        a.setHeaderText(currentTextRB.getString("badShortInputLengthErrorMsg"));
                         a.showAndWait();
                     } else if (editAddr == (short)0xffff) {
                         // firstly, are you trying to 0xffff to 0x0000 me
@@ -1178,7 +1183,7 @@ public class FrontControl {
                                 //check input length
                                 Alert a = new Alert(Alert.AlertType.ERROR);
                                 a.setTitle("Bad Value!");
-                                a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                                a.setHeaderText(currentTextRB.getString("badShortInputLengthErrorMsg"));
                                 a.showAndWait();
                             } else if (newEndAddr < newStartAddr) {
                                 // are you trying to put your end addr before new addr?
@@ -1435,7 +1440,7 @@ public class FrontControl {
                             //check input length
                             Alert a = new Alert(Alert.AlertType.ERROR);
                             a.setTitle("Bad Value!");
-                            a.setHeaderText("Input a short in the hexadecimal format of 0xXXXX or XXXX");
+                            a.setHeaderText(currentTextRB.getString("badShortInputLengthErrorMsg"));
                             a.showAndWait();
                         } else if (newEndAddr < newStartAddr) {
                             // are you trying to put your end addr before new addr?
@@ -1683,11 +1688,22 @@ public class FrontControl {
                 a.setHeaderText("You did not enter a double for the autoclock CPU Hz parameter!");
                 a.showAndWait();
             }
-
-
         }
     }
 
+    @FXML
+    protected void aboutMeClicked(){
+        try{
+            Stage aboutStage = new Stage();
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("about.fxml")));
+            aboutStage.setScene(new Scene(root));
+            aboutStage.setTitle("About Mii");
+            aboutStage.initModality(Modality.WINDOW_MODAL);
+            aboutStage.initOwner(allPane.getScene().getWindow());
+            aboutStage.setResizable(false);
+            aboutStage.show();
+        } catch (Exception e){e.printStackTrace();}
+    }
 
 
 }

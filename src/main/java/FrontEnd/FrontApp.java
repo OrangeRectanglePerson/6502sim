@@ -9,10 +9,12 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class FrontApp extends Application {
     @Override
@@ -44,10 +46,11 @@ public class FrontApp extends Application {
 
     }
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage){
         SplashScreen ss = new SplashScreen();
         ss.show();
         stage.setScene(ss.getSplashScene());
+        stage.getIcons().add(new Image(Objects.requireNonNull(FrontApp.class.getResourceAsStream("MOS_6502_Thumbnail.jpg"))));
         stage.setTitle("Starting Up");
         stage.setResizable(false);
         ss.getTimeline().setOnFinished(e -> {
