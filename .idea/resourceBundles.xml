@@ -4,7 +4,11 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/words.properties" />
     <custom-resource-bundle>
       <file value="file://$PROJECT_DIR$/src/main/resources/words.properties" />
+      <file value="file://$PROJECT_DIR$/src/main/resources/words_de_DE.properties" />
       <file value="file://$PROJECT_DIR$/src/main/resources/words_en_US.properties" />
+      <file value="file://$PROJECT_DIR$/src/main/resources/words_fr_FR.properties" />
+      <file value="file://$PROJECT_DIR$/src/main/resources/words_it_IT.properties" />
+      <file value="file://$PROJECT_DIR$/src/main/resources/words_zh_CN.properties" />
       <base-name>words</base-name>
     </custom-resource-bundle>
   </component>

@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1696,6 +1697,61 @@ public class FrontControl {
         try{
             Stage aboutStage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("about.fxml")));
+
+            //find the credits label
+            final AtomicReference<Label> creditsLabel = new AtomicReference<>();
+            for (Node n: root.getChildrenUnmodifiable()) {
+                if(n.getClass().getSimpleName().equals("Label")) {
+                    creditsLabel.set((Label) n);
+                    creditsLabel.get().setText(currentTextRB.getString("aboutMeText"));
+                }
+            }
+
+            //find the language buttons
+            Button enButt = new Button();
+            Button frButt = new Button();
+            Button itButt = new Button();
+            Button deButt = new Button();
+            for (Node n: root.getChildrenUnmodifiable()) {
+                if(n.getClass().getSimpleName().equals("Button")
+                        && ((Button) n).getText().equals("EN")) enButt = (Button) n;
+
+                if(n.getClass().getSimpleName().equals("Button")
+                    && ((Button) n).getText().equals("FR")) frButt = (Button) n;
+
+                if(n.getClass().getSimpleName().equals("Button")
+                        && ((Button) n).getText().equals("IT")) itButt = (Button) n;
+
+                if(n.getClass().getSimpleName().equals("Button")
+                        && ((Button) n).getText().equals("DE")) deButt = (Button) n;
+            }
+            enButt.setOnAction( eh -> {
+                changeLanguage(Locale.ENGLISH);
+                if(creditsLabel.get() != null) {
+                    creditsLabel.get().setText(currentTextRB.getString("aboutMeText"));
+                }
+            });
+            frButt.setOnAction( eh -> {
+                changeLanguage(Locale.FRANCE);
+                if(creditsLabel.get() != null) {
+                    creditsLabel.get().setText(currentTextRB.getString("aboutMeText"));
+                }
+            });
+            itButt.setOnAction( eh -> {
+                changeLanguage(Locale.ITALY);
+                if(creditsLabel.get() != null) {
+                    creditsLabel.get().setText(currentTextRB.getString("aboutMeText"));
+                }
+            });
+            deButt.setOnAction( eh -> {
+                changeLanguage(Locale.GERMANY);
+                if(creditsLabel.get() != null) {
+                    creditsLabel.get().setText(currentTextRB.getString("aboutMeText"));
+                }
+            });
+
+
+
             aboutStage.setScene(new Scene(root));
             aboutStage.setTitle("About Mii");
             aboutStage.initModality(Modality.WINDOW_MODAL);
@@ -1705,5 +1761,9 @@ public class FrontControl {
         } catch (Exception e){e.printStackTrace();}
     }
 
+    private void changeLanguage(Locale l){
+        ResourceBundle.clearCache();
+        currentTextRB = ResourceBundle.getBundle("words", l);
+    }
 
 }

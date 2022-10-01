@@ -64,7 +64,7 @@
                         <Font name="Consolas" size="13.5" />
                      </font>
                   </TextArea>
-                  <Button fx:id="debuggerShowAllButt" alignment="CENTER" layoutX="160.0" layoutY="18.0" mnemonicParsing="false" onAction="#debuggerShowAllButtAction" prefHeight="40.0" prefWidth="50.0" style="-fx-background-insets: 0;" stylesheets="@button.css" text="Show&#10;All" textAlignment="CENTER" AnchorPane.leftAnchor="165.0" AnchorPane.topAnchor="10.0">
+                  <Button fx:id="debuggerShowAllButt" alignment="CENTER" layoutX="160.0" layoutY="18.0" mnemonicParsing="false" onAction="#debuggerShowAllButtAction" prefHeight="40.0" prefWidth="50.0" style="-fx-background-insets: 0;" stylesheets="@button.css" text="All" textAlignment="CENTER" AnchorPane.leftAnchor="165.0" AnchorPane.topAnchor="10.0">
                      <font>
                         <Font name="Consolas Bold" size="12.5" />
                      </font>

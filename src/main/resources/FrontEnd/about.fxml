@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -8,9 +9,9 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label contentDisplay="CENTER" layoutX="565.0" layoutY="138.0" prefHeight="390.0" prefWidth="235.0" text="MOS 6502 Microcomputer Emulator&#10;&#10;Brought to you by: &#10;LIM DEVON (M22301)&#10;NUS High School of Math &amp; Science &#10;&#10;Image Credits:&#10;Wikimedia Commons&#10;&#10;Thanks to 6502.org, OneLoneCoder, Mass:Werk and StackOverflow for providing the valuable information that makes this project possible" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="576.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+      <Label fx:id="creditsLabel" contentDisplay="CENTER" layoutX="565.0" layoutY="138.0" prefHeight="355.0" prefWidth="220.0" text="MOS 6502 Microcomputer Emulator&#10;&#10;Brought to you by: &#10;LIM DEVON (M22301)&#10;NUS High School of Math &amp; Science &#10;&#10;Image Credits:&#10;Wikimedia Commons&#10;&#10;Thanks to 6502.org, OneLoneCoder, Mass:Werk and StackOverflow for providing the valuable information that makes this project possible" wrapText="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="575.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
          <font>
-            <Font name="Courier New Bold" size="15.0" />
+            <Font name="Courier New Bold" size="14.0" />
          </font>
       </Label>
       <ImageView fitHeight="390.0" fitWidth="567.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
@@ -18,5 +19,9 @@
             <Image url="@MOS_6502_AD.jpg" />
          </image>
       </ImageView>
+      <Button layoutX="653.0" layoutY="353.0" mnemonicParsing="false" prefWidth="50.0" text="EN" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="575.0" AnchorPane.topAnchor="365.0" />
+      <Button layoutX="611.0" layoutY="368.0" mnemonicParsing="false" prefWidth="50.0" text="FR" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="630.0" AnchorPane.topAnchor="365.0" />
+      <Button layoutX="685.0" layoutY="368.0" mnemonicParsing="false" prefWidth="50.0" text="IT" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="685.0" AnchorPane.topAnchor="365.0" />
+      <Button layoutX="735.0" layoutY="368.0" mnemonicParsing="false" prefWidth="50.0" text="DE" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="740.0" AnchorPane.topAnchor="365.0" />
    </children>
 </AnchorPane>
