@@ -64,7 +64,7 @@ public class FrontApp extends Application {
                     FXMLLoader fxmlLoader = new FXMLLoader(FrontApp.class.getResource("Front.fxml"));
                     Scene scene = new Scene(fxmlLoader.load());
                     stage.setResizable(true);
-                    stage.setTitle("6502 Microcomputer Emulator Va5");
+                    stage.setTitle("6502 Microcomputer Emulator Va5.1");
                     stage.setScene(scene);
                     stage.setResizable(false);
                 }
