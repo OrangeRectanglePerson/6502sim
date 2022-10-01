@@ -48,7 +48,14 @@
                   <Insets />
                </opaqueInsets>
             </ToolBar>
-            <VBox fx:id="devicePane" alignment="TOP_CENTER" prefHeight="555.0" prefWidth="440.0" style="-fx-background-color: #222222;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="45.0" />
+            <VBox fx:id="devicePane" alignment="TOP_CENTER" prefHeight="555.0" prefWidth="440.0" style="-fx-background-color: #222222;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="45.0">
+               <children>
+                  <Label prefHeight="80.0" prefWidth="370.0" text="Click on a button above to access a device menu" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font name="Consolas" size="18.0" />
+                     </font>
+                  </Label>
+               </children></VBox>
          </children></AnchorPane>
       <AnchorPane layoutX="586.0" layoutY="389.0" prefHeight="600.0" prefWidth="360.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="440.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
