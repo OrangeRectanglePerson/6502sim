@@ -3,7 +3,7 @@ package Devices;
 public class ROM extends Device{
 
 
-    private final byte[] storage;
+    private byte[] storage;
 
     public ROM(String _name, short _startAddress, short _endAddress){
         this.deviceName = _name;
@@ -50,6 +50,20 @@ public class ROM extends Device{
     //no writing data into the ROM
     @Override
     public void passivelyRead(short receiveAdr, byte data) {
+    }
+
+    @Override
+    public void setStartAddress(short _startAddress) {
+        super.setStartAddress(_startAddress);
+        if(Short.compareUnsigned(endAddress,startAddress)+1 > 0) this.storage = new byte[Short.compareUnsigned(endAddress,startAddress)+1];
+        else this.storage = null;
+    }
+
+    @Override
+    public void setEndAddress(short _endAddress) {
+        super.setEndAddress(_endAddress);
+        if(Short.compareUnsigned(endAddress,startAddress)+1 > 0) this.storage = new byte[Short.compareUnsigned(endAddress,startAddress)+1];
+        else this.storage = null;
     }
 
 
