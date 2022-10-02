@@ -996,9 +996,15 @@ public class FrontControl {
                     selectedDisplay.get().clearDisp();
                     iv.setImage(selectedDisplay.get().getFrame());
                 }
-                else iv.setImage(
-                        new Image(Objects.requireNonNull(FrontControl.class
-                                .getResourceAsStream("/FrontEnd/select display to view.png"))));
+                else {
+                    iv.setImage(
+                            new Image(Objects.requireNonNull(FrontControl.class
+                                    .getResourceAsStream("/FrontEnd/select display to view.png"))));
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("NO Display DEVICE SELECTED!");
+                    a.setHeaderText("Select a display device to wipe VRAM.");
+                    a.showAndWait();
+                }
             });
 
 
@@ -1665,8 +1671,8 @@ public class FrontControl {
                 //try to get Hz Double
                 double autoClockHzIn = Double.parseDouble(autoClockTF.getText());
 
-                //if 0Hz, do nothing (or else div by 0 error
-                if(autoClockHzIn == 0) return;
+                //if <=0Hz, do nothing (or else div by 0 error
+                if(autoClockHzIn <= 0) return;
 
                 //clear old timeline of autoclock
                 autoClockTimeline.getKeyFrames().clear();
